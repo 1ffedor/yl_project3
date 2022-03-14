@@ -101,3 +101,12 @@ header .buttons_header .btn_click:hover {
     background: #71A9F7;
     transition-duration: 0.2s;  /*время срабоатывания*/
 }
+
+div .main_content {
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+    -ms-align-items: center;
+    align-items: center; 
+    border: 1px solid black;
+}

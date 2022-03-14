@@ -107,3 +107,26 @@ header .buttons_header .btn_click:hover {
     background: #71A9F7;
     transition-duration: 0.2s;  /*время срабоатывания*/
 }
+
+main {
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+    -ms-align-items: center;
+    align-items: center;
+    margin: 20px auto;
+    max-width: 70%;
+    background: blue;
+}
+
+main .main_content {
+    margin:0;
+    padding:0;
+    background: purple;
+}
+
+main .main_content .main_page_description {
+    text-align: center;
+    margin: auto;
+    background: red;
+}
