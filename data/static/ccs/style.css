@@ -1,0 +1,99 @@
+:root {
+    --color-background-main: #FDFFFC;
+    --color-main-blue: #6665DD;
+}
+
+body{
+    background: var(--color-background-main);
+/*    background: linear-gradient(87deg, rgba(255,251,163,1) 0%, rgba(189,236,255,1) 100%);*/
+}
+
+header {
+    margin: auto 20px;
+/*    max-width: 90%;*/
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+    -ms-align-items: center;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid black;
+}
+
+header .logo{
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+    -ms-align-items: center;
+    align-items: center;
+/*    padding-left: 20px auto;*/
+}
+
+header .logo >a {
+    border-radius: 15px;
+    text-decoration: none;
+    margin: auto 10px;
+}
+
+header .logo #header_logo {
+    font-size: 50px;
+    color: black;
+    font-weight: 600;
+    padding: 5px 10x; /*отступ снаружи*/
+    border: 2px solid white;
+}
+
+header .buttons_header {
+    display: -webkit-flex;
+    display: -ms-flex;
+    display: flex;
+    -ms-align-items: center;
+    align-items: center;
+    padding-top: 10px;  /*чтобы по центру*/
+/*    padding-right: 20px auto;*/
+}
+
+header .buttons_header >a {
+    border-radius: 15px;
+    text-decoration: none;
+    margin: auto 10px;
+}
+
+header .buttons_header .btn_light {
+    font-size: 20px;
+    color: black;
+    font-weight: 600;
+    padding: 5px 10px; /*отступ снаружи*/
+    border: 2px solid white;
+/*    background: #71A9F7;*/
+}
+
+header .buttons_header .btn_light:hover {
+    font-size: 20px;
+    color: white;
+    font-weight: 600;
+    border: 2px solid var(--color-main-blue);
+    padding: 5px 10px;
+    background: var(--color-main-blue);
+    transition-duration: 0.2s;  /*время срабоатывания*/
+}
+
+header .buttons_header .btn_click {
+    font-size: 20px;
+    color: #71A9F7;
+    font-weight: 600;
+    padding: 5px 10px; /*отступ снаружи*/
+    border: 2px solid white;
+}
+
+header .buttons_header .btn_click:hover {
+    font-size: 20px;
+    color: white;
+    font-weight: 600;
+    border: 2px solid #71A9F7;
+    padding: 5px 10px;
+    background: #71A9F7;
+    transition-duration: 0.2s;  /*время срабоатывания*/
+}
+
+    
