@@ -23,7 +23,6 @@ def start_page():
 @app.route('/login', methods=["GET", "POST"])
 def login_page():
     page_title = "Войти"
-    if requests.method()
     return render_template("login_page.html", page_title=page_title)
 
 
