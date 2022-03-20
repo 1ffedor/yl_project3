@@ -13,10 +13,18 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 @app.route('/')
 def start_page():
-    title = "Главная"
-    # if login:
-    #     pass  # если авторизован
-    return render_template(MAIN_PAGE_HTML, title=title)
+    # url_mdb_css = url_for('static', filename='css/mdb.min.css')
+    # url_custom_css = url_for('static', filename='css/style.css')
+    # url_mdb_js = url_for('static', filename='js/mdb.min.js')
+    page_title = "mylbudget"
+    return render_template("start_page.html", page_title=page_title)
+
+
+@app.route('/login', methods=["GET", "POST"])
+def login_page():
+    page_title = "Войти"
+    if requests.method()
+    return render_template("login_page.html", page_title=page_title)
 
 
 if __name__ == '__main__':
