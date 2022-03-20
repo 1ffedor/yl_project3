@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block body_main_container %}
+    <div class="card col-lg-9 mx-auto">
+    <!--                заголовок-->
+        <div class="card-header text-center">
+            <h2>
+                Авторизация
+            </h2>
+        </div>
+    <!--                тело-->
+        <div class="card-body">
+    <!--                    форма-->
+            <form action="" method="post">
+                <div class="row my-3">
+    <!--
+                    <label for="inputEmail" class="col-md-3 text-center">
+                        <h4>Email</h4>
+                    </label>
+    -->
+                    <div class="col-md-6 mx-auto">
+                        <input type="email" class="form-control" id="inputEmail" placeholder="email">
+                    </div>
+
+                </div>
+                <div class="row my-3">
+    <!--
+                    <label for="inputEmail" class="col-md-3 text-center">
+                        <h4>username</h4>
+                    </label>
+    -->
+                    <div class="col-md-6 mx-auto">
+                        <input type="username" class="form-control" id="inputUsername" placeholder="логин">
+                    </div>
+
+                </div>
+                <div class="row my-3">
+    <!--
+                    <label for="inputEmail" class="col-md-3 text-center">
+                        <h4>username</h4>
+                    </label>
+    -->
+                    <div class="col-md-6 mx-auto">
+                        <input type="password" class="form-control" id="inputPassword" placeholder="пароль">
+                    </div>
+
+                </div>
+                <div class="row my-3">
+    <!--
+                    <label for="inputEmail" class="col-md-3 text-center">
+                        <h4>username</h4>
+                    </label>
+    -->
+                    <div class="col-md-6 mx-auto">
+                        <input type="password" class="form-control" id="inputPassword" placeholder="повторите пароль">
+                    </div>
+
+                </div>
+                <div class="row my-3">
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">Войти</button>
+                    </div>
+                </div>
+            </form>
+            <div class="card-footer text-center">
+                <p>Нет аккаунта? <a href="#">Зарегистрируйтесь!</a></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
