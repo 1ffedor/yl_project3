@@ -9,7 +9,7 @@ import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
-db_session.global_init("db/blogs.db")
+db_session.global_init("db/app_users.db")
 
 
 @app.route('/')
@@ -30,27 +30,91 @@ def login_page():
 @app.route('/registration', methods=["GET", "POST"])
 def registration_page():
     page_title = "Регистрация"
+    message = ""
+    html_file = "registration_page.html"
+    have_errors = False
+
+    # сами названия классов
+    my_0 = 'my-0'
+    is_valid = my_0 + " is-valid"  # my-0 чтоб не было отступа
+    is_invalid = "is-invalid"
+
+    # словарь значений котореы добавляются в класссы инпутов для показания где все верно а где ошбика
+    input_errors = {
+        "email": {
+            "errclass": "",
+            "invalid-feedback": ""},
+        "username": {
+            "errclass": "",
+            "invalid-feedback": ""},
+        "password": {
+            "errclass": "",
+            "invalid-feedback": ""},
+        "password_again": {
+            "errclass": "",
+            "invalid-feedback": ""}
+    }
+
     form = RegisterForm()
+
     if form.validate_on_submit():
-        if form.password.data != form.password_again.data:
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Пароли не совпадают")
+        # данные из полей
+        email = form.email.data.lower()
+        username = form.username.data
+        password = form.password.data
+        password_again = form.password_again.data
+
+        for key in input_errors.keys():
+            # проход по всем инпутам и даем им si valid
+            input_errors[key]["errclass"] = is_valid
+
+        if password != password_again:
+            # если пароли не совпадают
+            have_errors = True
+            input_from = "password"
+
+            message = "Пароли не совпадают!"
+
+            input_errors[input_from]["errclass"] = is_invalid
+            input_errors[f"{input_from}_again"]["errclass"] = is_invalid
+
+            input_errors["password"]["invalid-feedback"] = message
+            input_errors[f"{input_from}_again"]["invalid-feedback"] = message
+
         db_sess = db_session.create_session()
-        if db_sess.query(User).filter(User.email == form.email.data).first():
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Такой пользователь уже есть")
-        user = User(
-            name=form.name.data,
-            email=form.email.data,
-            about=form.about.data
-        )
+
+        if db_sess.query(User).filter(User.email == email).first():
+            # проверка на наличие уже зарегистрированного с таким майлом
+            have_errors = True
+            input_from = "email"
+
+            message = "Пользователь с таким email уже есть!"
+
+            input_errors[input_from]["errclass"] = is_invalid
+            input_errors[input_from]["invalid-feedback"] = message
+
+        if db_sess.query(User).filter(User.username == username).first():
+            # проверка на наличие пользователя с таким логином
+            have_errors = True
+            input_from = "username"
+
+            message = "Пользователь с таким логином уже есть!"
+
+            input_errors[input_from]["errclass"] = is_invalid
+            input_errors[input_from]["invalid-feedback"] = message
+
+        if have_errors:
+            # если есть ошибки выводим
+            return render_template(html_file, page_title=page_title, form=form, input_errors=input_errors)
+        # иначе записываем в бд и редиректим
+        user = User(email=email, username=username)
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
-        return redirect('/login')
-    return render_template("registration_page.html", page_title=page_title, form=form)
+
+        return redirect('/')
+
+    return render_template(html_file, page_title=page_title, form=form, input_errors=input_errors)
 
 
 if __name__ == '__main__':
