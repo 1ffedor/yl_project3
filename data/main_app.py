@@ -52,6 +52,9 @@ def registration_page():
             "invalid-feedback": ""},
         "password_again": {
             "errclass": "",
+            "invalid-feedback": ""},
+        "currency": {
+            "errclass": "",
             "invalid-feedback": ""}
     }
 
@@ -63,10 +66,13 @@ def registration_page():
         username = form.username.data
         password = form.password.data
         password_again = form.password_again.data
-
+        currency = form.currency.data
+        print(currency)
         for key in input_errors.keys():
             # проход по всем инпутам и даем им si valid
-            input_errors[key]["errclass"] = is_valid
+            if key != "currency":
+                # кроме валюты, чтобы галочка не мешала
+                input_errors[key]["errclass"] = is_valid
 
         if password != password_again:
             # если пароли не совпадают
@@ -107,6 +113,7 @@ def registration_page():
             # если есть ошибки выводим
             return render_template(html_file, page_title=page_title, form=form, input_errors=input_errors)
         # иначе записываем в бд и редиректим
+        print(currency)
         user = User(email=email, username=username)
         user.set_password(form.password.data)
         db_sess.add(user)

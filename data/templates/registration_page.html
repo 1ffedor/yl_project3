@@ -13,7 +13,7 @@
     <!--                    форма-->
             <form action="" method="post">
                 {{ form.hidden_tag() }}
-                <div class="row my-3">
+                <div class="row my-4">
     <!--
                     <label for="inputEmail" class="col-md-3 text-center">
                         <h4>Email</h4>
@@ -36,7 +36,7 @@
                     </div>
 
                 </div>
-                <div class="row my-3">
+                <div class="row my-4">
     <!--
                     <label for="inputEmail" class="col-md-3 text-center">
                         <h4>username</h4>
@@ -58,7 +58,7 @@
                     </div>
 
                 </div>
-                <div class="row my-3">
+                <div class="row my-4">
     <!--
                     <label for="inputEmail" class="col-md-3 text-center">
                         <h4>username</h4>
@@ -81,7 +81,7 @@
                     </div>
 
                 </div>
-                <div class="row my-3">
+                <div class="row my-4">
     <!--
                     <label for="inputEmail" class="col-md-3 text-center">
                         <h4>username</h4>
@@ -101,9 +101,28 @@
                             <label class="form-label", for="inputPasswordAgain">Повторите пароль</label>
                         </div>
                     </div>
-
                 </div>
-                <div class="row my-3">
+                <div class="row my-4">
+                    <div class="col-md-6 mx-auto">
+                        <div class="input-group">
+                            <label class="col-form-label col-9">Основная валюта:</label>
+                            {{ form.currency(class="form-select rounded " + input_errors["currency"]["errclass"], id="selectCurrency") }} 
+                            {% for error in form.currency.errors %}
+                                <p class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+<!--
+                            <select class="form-select col-3" id="selectCurrency" required>
+                                <option selected><i class=""></i>RUB</option>
+                                <option>USD</option>
+                                <option>EUR</option>
+                            </select>
+-->
+                        </div>
+                    </div>
+                </div>
+                <div class="row my-4">
                     <div class="text-center">
                         {{ form.submit(class="btn btn-primary", type="submit") }}
 <!--                        <button type="submit" class="btn btn-primary">Зарегистрироваться</button>-->

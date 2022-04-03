@@ -67,8 +67,10 @@ header {
     margin-bottom: 40px;
     font-weight: 900;
 }
-
-
+/* цвет placeholderov*/
+.form-label {
+    color: #666666 !important;
+}
 /*
 main {
     background: red;
