@@ -32,28 +32,12 @@
   </head>
   <body>
     <header>
-<!--        верхняя панель-->
-        <nav class="navbar fixed-top navbar-expand-lg">
-            <div class="container-fluid">
-                
-                <a href="/" class="navbar-brand"><img src="logo.svg" alt="mylbydget" class="img-fluid"></a>
-<!--                кнопка менюшки-->
-                <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarContent" aria-controls="navContent" aria-expanded="false" aria-label="Toggle navigation"><i class="fas fa-bars"></i></button>
-                
-                <div class="collapse navbar-collapse" id="navbarContent">
-<!--                    .ms-auto чтобы вправо притянулось -->
-                    <div class="navbar-nav ms-auto">
-                        <a class="nav-link me-20" href="/about">О нас</a>
-                        <a class="btn btn-primary" href="/login" role="button">Войти</a>
-                        <a class="btn btn-light px-3"><i class="fab fa-telegram" ></i></a>
-                    </div>
-                </div>
-                
-            </div>
-        </nav>
+        {% block header %}
+        {% endblock %}
+
         
 <!--
-        <div class="sidebar-fixed position-fixed">
+        <div class="sidebar-fixed position-fixed" id="navbarContent">
             
             <a href="#" class="logo-wrapper">
                 <img src="logo.svg" alt="mylbydget" class="img-fluid">

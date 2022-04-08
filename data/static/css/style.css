@@ -40,19 +40,29 @@ header {
     height: 10vh;
 }
 
-.bgred {
-/*    background: blue;*/
-    margin-bottom: 50px;
-}
-
 .sidebar-fixed {
     height: 100vh;
     width: 270px;
     box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), box-shadow: 0 2px 5px 0 rgba(0,0,0,0.12);
-    z-index: 1050px;
+    z-index: 1050;
+    background-color: white;
     padding: 1.5rem;
     padding-top: 0;
 }
+
+/*
+@media (min-width: 1200px){
+    .navbar, .page-footer, main {
+        padding-left: 270px;
+    }
+}
+
+@media (max-width: 1199.98px){
+    .sidebar-fixed {
+        display: none;
+    }
+}
+*/
 
 .container mt-4 {
     background: red;

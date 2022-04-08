@@ -1,5 +1,34 @@
 {% extends "base.html" %}
 
+{% block header %}
+    <!--        верхняя панель-->
+        <nav class="navbar fixed-top navbar-expand-lg navbar-light white">
+            <div class="container-fluid">
+                
+                <a href="/" class="navbar-brand"><img src="logo.svg" alt="mylbydget" class="img-fluid"></a>
+<!--                кнопка менюшки-->
+<!--
+                <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarContent" aria-controls="navContent" aria-expanded="false" aria-label="Toggle navigation"><i class="fas fa-bars"></i></button>
+                
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    .ms-auto чтобы вправо притянулось 
+                    <div class="navbar-nav ms-auto">
+                        <a class="btn text-center" href="/login" role="button">Войти</a>
+                        <a class="btn btn-primary text-center mx-10" href="/registration" role="button">Зарегистрироваться</a>
+                        <a class="btn btn-light px-3"><i class="fab fa-telegram" ></i></a>
+                    </div>
+                </div>
+-->
+                <div class="navbar-nav ms-auto">
+                    <a class="btn text-center" href="/login" role="button">Войти</a>
+                    <a class="btn btn-primary text-center mx-10" href="/registration" role="button">Зарегистрироваться</a>
+                    <a class="btn btn-light px-3"><i class="fab fa-telegram" ></i></a>
+                 </div>
+                
+            </div>
+        </nav>
+{% endblock %}
+
 {% block body_main_container %}
     <div class="card col-lg-9 mx-auto">
     <!--                заголовок-->
@@ -105,9 +134,9 @@
                 <div class="row my-4">
                     <div class="col-md-6 mx-auto">
                         <div class="input-group">
-                            <label class="col-form-label col-9">Основная валюта:</label>
-                            {{ form.currency(class="form-select rounded " + input_errors["currency"]["errclass"], id="selectCurrency") }} 
-                            {% for error in form.currency.errors %}
+                            <label class="col-form-label col-9">Ваша основная валюта:</label>
+                            {{ form.main_currency(class="form-select rounded " + input_errors["main_currency"]["errclass"], id="selectMainCurrency") }} 
+                            {% for error in form.main_currency.errors %}
                                 <p class="alert alert-danger" role="alert">
                                     {{ error }}
                                 </p>
@@ -121,7 +150,7 @@
 -->
                         </div>
                     </div>
-                </div>
+                </div>             
                 <div class="row my-4">
                     <div class="text-center">
                         {{ form.submit(class="btn btn-primary", type="submit") }}

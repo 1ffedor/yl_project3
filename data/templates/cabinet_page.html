@@ -1,0 +1,36 @@
+<p>{{ user }}</p>
+
+{% extends "base.html" %}
+
+{% block header %}
+<!--        верхняя панель-->
+    <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid align-items-center">
+
+            <a href="/" class="navbar-brand"><img src="logo.svg" alt="mylbydget" class="img-fluid"></a>
+<!--                кнопка менюшки-->
+            <ul class="nav">
+                <li class="nav-item my-auto">Admin</li>
+                <li class="nav-item my-auto mx-3"><img src="https://github.com/mdo.png" alt="mdo" width="48" height="" class="rounded-circle"></li>
+                <li class="nav-item my-auto"><a class="btn text-center" href="/logout" role="button">Выйти</a></li>
+            </ul>
+
+        </div>
+    </nav>
+{% endblock %}
+
+{% block body_main_container %}
+    <div class="card col-lg-9 mx-auto">
+    <!--                заголовок-->
+        <div class="card-header text-center">
+            <h2>
+                Авторизация
+            </h2>
+        </div>
+    <!--                тело-->
+        <div class="card-body">
+
+
+        </div>
+    </div>
+{% endblock %}

@@ -1,44 +1,69 @@
 from data import db_session
 from data.users import User
-# from data.news import News
-from flask import Flask, url_for, render_template, redirect
+from flask import Flask, url_for, render_template, redirect, request
+import flask_login
+from flask_login import LoginManager, login_user, login_required, logout_user
 import requests
 from constants import *
-from forms.user import RegisterForm
+from forms.user import RegisterForm, LoginForm
 import json
+import datetime
+from func_app import *
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(
+    days=30
+)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
 db_session.global_init("db/app_users.db")
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    # пользователя загрузка с бд
+    db_sess = db_session.create_session()
+    return db_sess.query(User).get(user_id)
+
+
+@login_manager.unauthorized_handler
+def unauthorized_callback():
+    # Перекинет неавторизованного сюда
+    # print(request.path)  # страница, откуда пришли
+    # return redirect(f'/login?next={request.path}')
+    return redirect(f'/login')
+
+
 @app.route('/')
+@app.route('/about')
 def start_page():
-    # url_mdb_css = url_for('static', filename='css/mdb.min.css')
-    # url_custom_css = url_for('static', filename='css/style.css')
-    # url_mdb_js = url_for('static', filename='js/mdb.min.js')
-    page_title = "mylbudget"
-    return render_template("start_page.html", page_title=page_title)
+    # главная
+    # константы
+    html = START_PAGE_HTML
+    page_title = START_PAGE_TITLE
+    # пользователь
+    current_user = flask_login.current_user
+    is_authenticated = user_is_authenticated(current_user)
 
+    if is_authenticated:
+        # если залогинен
+        return redirect('/cabinet')
 
-@app.route('/login', methods=["GET", "POST"])
-def login_page():
-    page_title = "Авторизация"
-    return render_template("login_page.html", page_title=page_title)
+    return render_template(html, page_title=page_title, user=current_user)
 
 
 @app.route('/registration', methods=["GET", "POST"])
 def registration_page():
-    page_title = "Регистрация"
+    # регистрация
+    page_title = REGISTRATION_PAGE_TITLE
+    html = REGISTRATION_PAGE_HTML
+
+    # ифнормация об ошибках
     message = ""
-    html_file = "registration_page.html"
     have_errors = False
-
-    # сами названия классов
-    my_0 = 'my-0'
-    is_valid = my_0 + " is-valid"  # my-0 чтоб не было отступа
-    is_invalid = "is-invalid"
-
     # словарь значений котореы добавляются в класссы инпутов для показания где все верно а где ошбика
     input_errors = {
         "email": {
@@ -53,75 +78,226 @@ def registration_page():
         "password_again": {
             "errclass": "",
             "invalid-feedback": ""},
-        "currency": {
+        "main_currency": {
             "errclass": "",
             "invalid-feedback": ""}
     }
 
-    form = RegisterForm()
+    # названия классов для полей ввода
+    my_0 = 'my-0'  # my-0 чтоб не было отступа
+    is_valid = f"{my_0} {IS_VALID}"  # если прошла проверку
+    is_invalid = IS_INVALID  # иначе
 
-    if form.validate_on_submit():
+    next_page = request.args.get('next')  # куда потом перенаправить
+
+    reg_form = RegisterForm()
+
+    # проверка авторизации
+    current_user = flask_login.current_user
+    is_authenticated = user_is_authenticated(current_user)
+
+    if reg_form.validate_on_submit():
+        # кнопка зарегистрироваться
         # данные из полей
-        email = form.email.data.lower()
-        username = form.username.data
-        password = form.password.data
-        password_again = form.password_again.data
-        currency = form.currency.data
-        print(currency)
+        email = reg_form.email.data.lower()
+        username = reg_form.username.data
+        password = reg_form.password.data
+        password_again = reg_form.password_again.data
+        main_currency = reg_form.main_currency.data
+
         for key in input_errors.keys():
             # проход по всем инпутам и даем им si valid
-            if key != "currency":
+            if key != "main_currency":
                 # кроме валюты, чтобы галочка не мешала
                 input_errors[key]["errclass"] = is_valid
 
         if password != password_again:
             # если пароли не совпадают
             have_errors = True
-            input_from = "password"
+            input_form = "password"
 
             message = "Пароли не совпадают!"
 
-            input_errors[input_from]["errclass"] = is_invalid
-            input_errors[f"{input_from}_again"]["errclass"] = is_invalid
+            # красные рамки ПАРОЛЬ и ПОВТОРИТЬ ПАРОЛЬ
+            input_errors[input_form]["errclass"] = is_invalid
+            input_errors[f"{input_form}_again"]["errclass"] = is_invalid
 
+            # сообщение снизу
             input_errors["password"]["invalid-feedback"] = message
-            input_errors[f"{input_from}_again"]["invalid-feedback"] = message
+            input_errors[f"{input_form}_again"]["invalid-feedback"] = message
 
         db_sess = db_session.create_session()
+        user_email = db_sess.query(User).filter(User.email == email).first()
+        user_username = db_sess.query(User).filter(User.username == username).first()
 
-        if db_sess.query(User).filter(User.email == email).first():
+        if user_email:
             # проверка на наличие уже зарегистрированного с таким майлом
             have_errors = True
             input_from = "email"
 
             message = "Пользователь с таким email уже есть!"
 
+            # красная рамка EMAIL
             input_errors[input_from]["errclass"] = is_invalid
             input_errors[input_from]["invalid-feedback"] = message
 
-        if db_sess.query(User).filter(User.username == username).first():
-            # проверка на наличие пользователя с таким логином
+        if '@' in username:
             have_errors = True
             input_from = "username"
 
+            message = """Знак "@" не быть использован в логине!"""
+
+            # красная рамка USERNAME
+            input_errors[input_from]["errclass"] = is_invalid
+            input_errors[input_from]["invalid-feedback"] = message
+
+        elif user_username:
+            # проверка на наличие пользователя с таким логином
+            have_errors = True
+            input_form = "username"
+
             message = "Пользователь с таким логином уже есть!"
+
+            # красная рамка USERNAME
+            input_errors[input_form]["errclass"] = is_invalid
+            input_errors[input_form]["invalid-feedback"] = message
+
+        if have_errors:
+            # если есть ошибки выводим
+            return render_template(html, page_title=page_title, form=reg_form, input_errors=input_errors)
+
+        # иначе записываем в бд и редиректим
+        user = User(email=email, username=username)
+        user.set_password(reg_form.password.data)
+        db_sess.add(user)
+        db_sess.commit()
+
+        # if next_page:
+        #     # если пришли с другой страницы
+        #     return redirect(f'/login?next={next_page}')
+
+        return redirect('/login')
+
+    if is_authenticated:
+        # если залогинен
+        # if next_page:
+        #     # если с другой страницы пришел
+        #     return redirect(next_page)
+        return redirect('/cabinet')
+
+    return render_template(html, page_title=page_title, form=reg_form, input_errors=input_errors)
+
+
+@app.route('/login', methods=["GET", "POST"])
+def login_page():
+    # авторизация
+    page_title = LOGIN_PAGE_TITLE
+    html = LOGIN_PAGE_HTML
+
+    # ифнормация об ошибках
+    message = ""
+    have_errors = False
+    # словарь значений котореы добавляются в класссы инпутов для показания где все верно а где ошбика
+    input_errors = {
+        "email": {
+            "errclass": "",
+            "invalid-feedback": ""},
+        "password": {
+            "errclass": "",
+            "invalid-feedback": ""},
+    } 
+
+    # названия классов для полей ввода
+    my_0 = 'my-0'  # my-0 чтоб не было отступа
+    is_valid = f"{my_0} {IS_VALID}"  # если прошла проверку
+    is_invalid = IS_INVALID  # иначе
+
+    next_page = request.args.get('next')  # куда потом перенаправить
+
+    # если уже залогинен
+    current_user = flask_login.current_user
+    if current_user.is_authenticated:
+        if next_page:
+            # если пришли с другой страницы
+            return redirect(next_page)
+
+        return redirect('/cabinet')
+
+    log_form = LoginForm()
+
+    if log_form.validate_on_submit():
+        # данные из полей
+        email = log_form.email.data.lower()
+        password = log_form.password.data
+        remember_me = log_form.remember_me.data
+        # print(remember_me)
+
+        for key in input_errors.keys():
+            # проход по всем инпутам и даем им si valid
+            input_errors[key]["errclass"] = is_valid
+
+        db_sess = db_session.create_session()
+
+        user = db_sess.query(User).filter(User.email == log_form.email.data).first()
+
+        if user:
+            if user.check_password(password):
+                login_user(user, remember=remember_me)
+                return redirect("/registration")
+
+            have_errors = True
+            input_form = "password"
+
+            message = "Неверный пароль!"
+
+            input_errors[input_form]["errclass"] = is_invalid
+
+            input_errors["password"]["invalid-feedback"] = message
+        else:
+            # если не зареган
+            have_errors = True
+            input_from = "email"
+
+            message = "Пользователь с таким email не найден!"
 
             input_errors[input_from]["errclass"] = is_invalid
             input_errors[input_from]["invalid-feedback"] = message
 
         if have_errors:
             # если есть ошибки выводим
-            return render_template(html_file, page_title=page_title, form=form, input_errors=input_errors)
-        # иначе записываем в бд и редиректим
-        print(currency)
-        user = User(email=email, username=username)
-        user.set_password(form.password.data)
-        db_sess.add(user)
-        db_sess.commit()
+            return render_template(html, page_title=page_title, form=log_form, input_errors=input_errors)
+        # # иначе записываем в бд и редиректим
+        # user = User(email=email, username=username)
+        # user.set_password(log_form.password.data)
+        # db_sess.add(user)
+        # db_sess.commit()
 
-        return redirect('/')
+        return redirect('/cabinet')
 
-    return render_template(html_file, page_title=page_title, form=form, input_errors=input_errors)
+    return render_template(html, page_title=page_title, form=log_form, input_errors=input_errors)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/login")
+
+
+@app.route('/cabinet')
+@login_required
+def cabinet_menu_page():
+    current_user = flask_login.current_user
+    if not current_user.is_authenticated:
+        return redirect('/login')
+
+    page_title = "Кабинет"
+    message = ""
+    html = "cabinet_page.html"
+    have_errors = False
+
+    return render_template(html, page_title=page_title, user=current_user.username)
+    # return redirect('/login')
 
 
 if __name__ == '__main__':
