@@ -11,7 +11,9 @@
 <!--                кнопка менюшки-->
             <ul class="nav">
                 <li class="nav-item my-auto">Admin</li>
-                <li class="nav-item my-auto mx-3"><img src="https://github.com/mdo.png" alt="mdo" width="48" height="" class="rounded-circle"></li>
+                {% if avatar_path %}
+                    <li class="nav-item my-auto mx-3"><img src="{{ url_for('static', filename=avatar_path) }}"  alt="mdo" width="48" height="48" class="rounded-circle"></li>
+                {% endif %}
                 <li class="nav-item my-auto"><a class="btn text-center" href="/logout" role="button">Выйти</a></li>
             </ul>
 
@@ -24,7 +26,7 @@
     <!--                заголовок-->
         <div class="card-header text-center">
             <h2>
-                Авторизация
+                Личный кабинет
             </h2>
         </div>
     <!--                тело-->

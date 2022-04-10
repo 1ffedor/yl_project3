@@ -3,6 +3,7 @@ from data.users import User
 from flask import Flask, url_for, render_template, redirect, request
 import flask_login
 from flask_login import LoginManager, login_user, login_required, logout_user
+from werkzeug.utils import secure_filename
 import requests
 from constants import *
 from forms.user import RegisterForm, LoginForm
@@ -15,6 +16,7 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(
     days=30
 )
+app.config['UPLOAD_FOLDER'] = AVATAR_UPLOAD_FOLDER
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -58,12 +60,12 @@ def start_page():
 @app.route('/registration', methods=["GET", "POST"])
 def registration_page():
     # регистрация
+    # константы
     page_title = REGISTRATION_PAGE_TITLE
     html = REGISTRATION_PAGE_HTML
-
-    # ифнормация об ошибках
     message = ""
-    have_errors = False
+    have_errors = False  # ифнормация об ошибках
+    avatar_write = False  # записывать ли аватар в бд
     # словарь значений котореы добавляются в класссы инпутов для показания где все верно а где ошбика
     input_errors = {
         "email": {
@@ -79,6 +81,9 @@ def registration_page():
             "errclass": "",
             "invalid-feedback": ""},
         "main_currency": {
+            "errclass": "",
+            "invalid-feedback": ""},
+        "avatar": {
             "errclass": "",
             "invalid-feedback": ""}
     }
@@ -104,13 +109,20 @@ def registration_page():
         password = reg_form.password.data
         password_again = reg_form.password_again.data
         main_currency = reg_form.main_currency.data
+        avatar = reg_form.avatar.data
+        avatar_filename = ""
 
         for key in input_errors.keys():
             # проход по всем инпутам и даем им si valid
-            if key != "main_currency":
-                # кроме валюты, чтобы галочка не мешала
+            if key != "main_currency" and key != "avatar":
+                # кроме валюты и аватара, чтобы галочка не мешала
                 input_errors[key]["errclass"] = is_valid
 
+        db_sess = db_session.create_session()
+        user_email = db_sess.query(User).filter(User.email == email).first()
+        user_username = db_sess.query(User).filter(User.username == username).first()
+
+        # проверим все формы на валидность
         if password != password_again:
             # если пароли не совпадают
             have_errors = True
@@ -126,9 +138,22 @@ def registration_page():
             input_errors["password"]["invalid-feedback"] = message
             input_errors[f"{input_form}_again"]["invalid-feedback"] = message
 
-        db_sess = db_session.create_session()
-        user_email = db_sess.query(User).filter(User.email == email).first()
-        user_username = db_sess.query(User).filter(User.username == username).first()
+        if avatar:
+            if not allowed_avatar(avatar.filename):
+                # проверка корректности авы
+                have_errors = True
+                input_from = "avatar"
+
+                message = "Некорректный файл!"
+
+                # красная рамка AVATAR
+                input_errors[input_from]["errclass"] = is_invalid
+                input_errors[input_from]["invalid-feedback"] = message
+
+            else:
+                # иначе сделать зеленым
+                input_from = "avatar"
+                input_errors[input_from]["errclass"] = is_valid
 
         if user_email:
             # проверка на наличие уже зарегистрированного с таким майлом
@@ -167,8 +192,9 @@ def registration_page():
             return render_template(html, page_title=page_title, form=reg_form, input_errors=input_errors)
 
         # иначе записываем в бд и редиректим
-        user = User(email=email, username=username)
-        user.set_password(reg_form.password.data)
+        user = User(email=email, username=username, main_currency=main_currency)
+        user.set_password(password)
+        user.set_avatar_filename(avatar, avatar.filename)
         db_sess.add(user)
         db_sess.commit()
 
@@ -295,8 +321,9 @@ def cabinet_menu_page():
     message = ""
     html = "cabinet_page.html"
     have_errors = False
+    avatar_path = get_avatar_from_db(current_user)
 
-    return render_template(html, page_title=page_title, user=current_user.username)
+    return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path)
     # return redirect('/login')
 
 

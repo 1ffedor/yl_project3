@@ -48,7 +48,7 @@
                             <div class="invalid-feedback">
                               {{ input_errors["email"]["invalid-feedback"] }}
                             </div>
-                            <label class="form-label" for="inputEmail">Email</label>
+                            <label class="form-label" for="inputEmail">Email *</label>
                             {% for error in form.email.errors %}
                                 <p class="alert alert-danger" role="alert">
                                     {{ error }}
@@ -76,7 +76,7 @@
                             <div class="invalid-feedback">
                                 {{ input_errors["password"]["invalid-feedback"] }}
                             </div>
-                            <label class="form-label" for="inputPassword">Пароль</label>
+                            <label class="form-label" for="inputPassword">Пароль *</label>
                         </div>
                     </div>
                 </div>

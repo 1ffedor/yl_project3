@@ -81,6 +81,10 @@ header {
 .form-label {
     color: #666666 !important;
 }
+
+.text-danger {
+    font-size: .875rem;
+}
 /*
 main {
     background: red;
