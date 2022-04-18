@@ -94,66 +94,18 @@
 </header>
 {% endblock %}
 
-{% block pagecontent %}
-<div class="container-fluid" id="cabinetPageContent">
-    <div class="row mx-auto">
-        <div class="card" id="pagenameCard">
-            <!--                заголовок-->
-            <div class="card-header my-auto d-flex justify-content-between">
-                <h2 class="card-title my-auto">
-                    Личный кабинет
-                </h2>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWalletModal">
-                  Добавить счёт
-                </button>
-            </div>
-        </div>
+{% block body_main_container %}
+<div class="card col-lg-9 mx-auto">
+    <!--                заголовок-->
+    <div class="card-header text-center">
+        <h2>
+            Мои доходы
+        </h2>
     </div>
-    <!-- Добавить счёт -->
-    <div class="modal fade" id="addWalletModal" tabindex="-1" aria-labelledby="addWalletLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header d-flex justify-content-center">
-                    <h2 class="modal-title my-auto mx-auto" id="addWalletLabel">
-                        Добавление счёта
-                    </h2>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeModal"></button>
-                <div class="modal-body">
-                    ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                    <button type="button" class="btn btn-primary">Сохранить</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row mx-auto d-sm-flex justify-content-evenly">
-        <div class="card col-lg-5 my-2" id="budgetCard">
-            <!--                заголовок-->
-            <div class="card-header my-auto text-center">
-                <h3 class="my-auto">
-                    Бюджет
-                </h3>
-            </div>
-            <!--                тело-->
-            <div class="card-body d-sm-flex justify-content-between">
+    <!--                тело-->
+    <div class="card-body">
 
-            </div>
-        </div>
-        <div class="card col-lg-5 my-2" id="budgetCard">
-            <!--                заголовок-->
-            <div class="card-header my-auto text-center ">
-                <h3 class="my-auto">
-                    Операции
-                </h3>
-            </div>
-            <!--                тело-->
-            <div class="card-body d-sm-flex justify-content-between">
 
-            </div>
-        </div>
     </div>
 </div>
 {% endblock %}

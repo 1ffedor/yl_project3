@@ -101,10 +101,10 @@
             <!--                заголовок-->
             <div class="card-header my-auto d-flex justify-content-between">
                 <h2 class="card-title my-auto">
-                    Личный кабинет
+                    Мои счета
                 </h2>
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWalletModal">
-                  Добавить счёт
+                  Новый счёт
                 </button>
             </div>
         </div>
@@ -120,12 +120,80 @@
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeModal"></button>
                 <div class="modal-body">
-                    ...
+                    <form action="" method="post", enctype=multipart/form-data>
+                    {{ form.hidden_tag() }}
+                    <div class="row my-4">
+                        <div class="col-lg-6 mx-auto">
+        <!--                        is-valid зеленое my-0 нет отступов по y-->
+                            <div class="form-outline">
+                                {{ form.name(class="form-control " + input_errors["name"]["errclass"], id="Name", type="text", maxlength="16") }}
+                                <div class="invalid-feedback">
+                                    {{ input_errors["name"]["invalid-feedback"] }}
+                                </div>
+                                <label class="form-label" for="inputEmail">Название *</label>
+                                {% for error in form.name.errors %}
+                                    <p class="alert alert-danger" role="alert">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row my-4 d-flex justify-content-center">
+                        <div class="col-lg-4 col-8 my-auto">
+                            <div class="form-outline">
+                                {{ form.balance(class="form-control " + input_errors["balance"]["errclass"], id="Balance", type="number", min="0", max="1000000000", default="0") }}
+                                {% for error in form.balance.errors %}
+                                    <p class="alert alert-danger" role="alert">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                                <div class="invalid-feedback">
+                                  {{ input_errors["balance"]["invalid-feedback"] }}
+                                </div>
+                                <label class="form-label" for="inputUsername">Баланс *</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-4 my-auto">
+                            <div class="input-group">
+                                {{ form.main_currency(class="form-select rounded " + input_errors["main_currency"]["errclass"], id="MainCurrency") }} 
+                                {% for error in form.main_currency.errors %}
+                                    <p class="alert alert-danger" role="alert">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+<!--
+                    <div class="row my-4">
+                        <div class="col-lg-6 mx-auto">
+                            <div class="input-group">
+                                {{ form.main_currency(class="form-select rounded " + input_errors["main_currency"]["errclass"], id="MainCurrency") }} 
+                                {% for error in form.main_currency.errors %}
+                                    <p class="alert alert-danger" role="alert">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+-->
+                    <div class="row my-4">
+                        <div class="text-center">
+                            {{ form.submit(class="btn btn-primary", type="submit") }}
+        <!--                        <button type="submit" class="btn btn-primary">Зарегистрироваться</button>-->
+                        </div>
+                    </div>
+                </form>
                 </div>
+<!--
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                     <button type="button" class="btn btn-primary">Сохранить</button>
                 </div>
+-->
             </div>
         </div>
     </div>

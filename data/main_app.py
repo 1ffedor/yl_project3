@@ -6,16 +6,18 @@ from flask_login import LoginManager, login_user, login_required, logout_user
 from werkzeug.utils import secure_filename
 import requests
 from constants import *
-from forms.user import RegisterForm, LoginForm
+from forms.login import LoginForm
+from forms.registration import RegisterForm
+from forms.addwallet import AddWalletForm
 import json
 import datetime
 from func_app import *
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
-app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(
-    days=30
-)
+# app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(
+#     days=30
+# )
 app.config['UPLOAD_FOLDER'] = AVATAR_UPLOAD_FOLDER
 
 login_manager = LoginManager()
@@ -66,27 +68,9 @@ def registration_page():
     message = ""
     have_errors = False  # ифнормация об ошибках
     avatar_write = False  # записывать ли аватар в бд
+
     # словарь значений котореы добавляются в класссы инпутов для показания где все верно а где ошбика
-    input_errors = {
-        "email": {
-            "errclass": "",
-            "invalid-feedback": ""},
-        "username": {
-            "errclass": "",
-            "invalid-feedback": ""},
-        "password": {
-            "errclass": "",
-            "invalid-feedback": ""},
-        "password_again": {
-            "errclass": "",
-            "invalid-feedback": ""},
-        "main_currency": {
-            "errclass": "",
-            "invalid-feedback": ""},
-        "avatar": {
-            "errclass": "",
-            "invalid-feedback": ""}
-    }
+    input_errors = get_deepcopy_dict(REGISTRATION_PAGE_INPUT_ERRORS)
 
     # названия классов для полей ввода
     my_0 = 'my-0'  # my-0 чтоб не было отступа
@@ -223,15 +207,9 @@ def login_page():
     # ифнормация об ошибках
     message = ""
     have_errors = False
+
     # словарь значений котореы добавляются в класссы инпутов для показания где все верно а где ошбика
-    input_errors = {
-        "email": {
-            "errclass": "",
-            "invalid-feedback": ""},
-        "password": {
-            "errclass": "",
-            "invalid-feedback": ""},
-    } 
+    input_errors = get_deepcopy_dict(LOGIN_PAGE_INPUT_ERRORS)
 
     # названия классов для полей ввода
     my_0 = 'my-0'  # my-0 чтоб не было отступа
@@ -254,6 +232,7 @@ def login_page():
     if log_form.validate_on_submit():
         # данные из полей
         email = log_form.email.data.lower()
+        print(email)
         password = log_form.password.data
         remember_me = log_form.remember_me.data
         # print(remember_me)
@@ -264,7 +243,7 @@ def login_page():
 
         db_sess = db_session.create_session()
 
-        user = db_sess.query(User).filter(User.email == log_form.email.data).first()
+        user = db_sess.query(User).filter(User.email == email).first()
 
         if user:
             if user.check_password(password):
@@ -317,14 +296,81 @@ def cabinet_menu_page():
     if not current_user.is_authenticated:
         return redirect('/login')
 
-    page_title = "Кабинет"
+    page_title = "Главная"
     message = ""
     html = "cabinet_page.html"
     have_errors = False
     avatar_path = get_avatar_from_db(current_user)
+    sidebar_elements = get_deepcopy_dict(CABINET_PAGE_SIDEBAR_ELEMENTS)  # полная копия
 
-    return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path)
+    set_sidebar_a_active_class(sidebar_elements, page_title)  # устновить синим
+
+    return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
+                           sidebar_elements=sidebar_elements)
     # return redirect('/login')
+
+
+@app.route('/cabinet/wallets')
+@login_required
+def cabinet_wallets_page():
+    current_user = flask_login.current_user
+    if not current_user.is_authenticated:
+        return redirect('/login')
+
+    page_title = "Счета"
+    message = ""
+    html = "cabinet_wallets_page.html"
+    have_errors = False
+    avatar_path = get_avatar_from_db(current_user)
+    sidebar_elements = get_deepcopy_dict(CABINET_PAGE_SIDEBAR_ELEMENTS)  # полная копия
+
+    set_sidebar_a_active_class(sidebar_elements, page_title)  # устновить синим
+
+    addwallet_form = AddWalletForm()
+    input_errors = get_deepcopy_dict(CABINET_WALLETS_PAGE_ADD_WALLET_MODAL_INPUT_ERRORS)
+
+    return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
+                           sidebar_elements=sidebar_elements, form=addwallet_form, input_errors=input_errors)
+
+
+@app.route('/cabinet/income')
+@login_required
+def cabinet_income_page():
+    current_user = flask_login.current_user
+    if not current_user.is_authenticated:
+        return redirect('/login')
+
+    page_title = "Доходы"
+    message = ""
+    html = "cabinet_income_page.html"
+    have_errors = False
+    avatar_path = get_avatar_from_db(current_user)
+    sidebar_elements = get_deepcopy_dict(CABINET_PAGE_SIDEBAR_ELEMENTS)  # полная копия
+
+    set_sidebar_a_active_class(sidebar_elements, page_title)  # устновить синим
+
+    return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
+                           sidebar_elements=sidebar_elements)
+
+
+@app.route('/cabinet/expenses')
+@login_required
+def cabinet_expenses_page():
+    current_user = flask_login.current_user
+    if not current_user.is_authenticated:
+        return redirect('/login')
+
+    page_title = "Расходы"
+    message = ""
+    html = "cabinet_expenses_page.html"
+    have_errors = False
+    avatar_path = get_avatar_from_db(current_user)
+    sidebar_elements = get_deepcopy_dict(CABINET_PAGE_SIDEBAR_ELEMENTS)  # полная копия
+
+    set_sidebar_a_active_class(sidebar_elements, page_title)  # устновить синим
+
+    return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
+                           sidebar_elements=sidebar_elements)
 
 
 if __name__ == '__main__':

@@ -4,6 +4,7 @@ import os
 import random
 import string
 import cv2
+from copy import deepcopy
 
 
 def user_is_authenticated(current_user):
@@ -48,6 +49,24 @@ def get_avatar_from_db(current_user):
     avatar_path = f"{AVATARS_UPLOAD_URL_FOR_FOLDER}/{avatar_filename}"
 
     return (avatar_path)
+
+
+def get_deepcopy_dict(dict_):
+    # вернет копию словаря
+    return deepcopy(dict_)
+
+
+def set_sidebar_a_active_class(dict_, elem_title):
+    # поставить класс актив к элементу сайдбара a
+    try:
+        for key in dict_.keys():
+            if key == elem_title:
+                dict_[key]["a_class"] = f"""{dict_[key]["a_class"]} active"""
+                return dict_
+    except Exception as e:
+        print(f"error with set a active class")
+        return dict_
+
 
 
 
