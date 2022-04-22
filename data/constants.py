@@ -64,7 +64,7 @@ CABINET_PAGE_SIDEBAR_ELEMENTS = {
         "i_class": "fas fa-tachometer-alt fa-fw me-3",
         "text": "Счета"},
     "Операции": {
-        "href": "/cabinet/operations",
+        "href": "/cabinet/transactions",
         "a_class": "list-group-item list-group-item-action py-2 ripple",
         "i_class": "fas fa-tachometer-alt fa-fw me-3",
         "text": "Операции"
@@ -113,4 +113,31 @@ CABINET_WALLETS_PAGE_WALLETS_LIST = [
     }
 ]
 
+# CABINET_TRANSACTIONS_PAGE
+# ADD_TRANSACTION_MODAL
+CABINET_TRANSACTIONS_PAGE_ADD_TRANSACTION_MODAL_INPUT_ERRORS = {
+    "transaction_sum": {
+        "errclass": "",
+        "invalid-feedback": ""},
+    "currency": {
+        "errclass": "",
+        "invalid-feedback": ""},
+    "transaction_type": {
+        "errclass": "",
+        "invalid-feedback": ""},
+    "wallet": {
+        "errclass": "",
+        "invalid-feedback": ""},
+    "name": {
+        "errclass": "",
+        "invalid-feedback": ""},
+    "category": {
+        "errclass": "",
+        "invalid-feedback": ""},
+    "comment": {
+        "errclass": "",
+        "invalid-feedback": ""}
+}
+
+# CABINET_TRANSACTIONS_PAGE_WALLETS_LIST = ["dfsatgrsyhgcdfhdytrdyhfxhnbcfvhnvn", "visa", "dfsatgrsyhgcdfhdytrdyhfxhnbcfvhnvn"]
 

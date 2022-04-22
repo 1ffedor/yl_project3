@@ -129,6 +129,17 @@ def get_wallet_color(hex_color):
     return hex_color
 
 
+def get_wallets_names(wallets_list):
+    arr = []
+    try:
+        for el in wallets_list:
+            arr.append(el["name"])
+        return arr
+    except:
+        print("some problems  with get wallets_list")
+
+
+
 
 
 

@@ -11,9 +11,11 @@ from constants import *
 from forms.login import LoginForm
 from forms.registration import RegisterForm
 from forms.addwallet import AddWalletForm
+from forms.addtransaction import AddTransactionForm
 import json
 import datetime
 from func_app import *
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -332,16 +334,16 @@ def cabinet_wallets_page():
 
     set_sidebar_a_active_class(sidebar_elements, page_title)  # устновить синим
 
-    addwallet_form = AddWalletForm()
+    add_wallet_form = AddWalletForm()
     input_errors = get_deepcopy_dict(CABINET_WALLETS_PAGE_ADD_WALLET_MODAL_INPUT_ERRORS)
     wallets_list = get_wallets_list(Wallet, current_user)
 
-    if addwallet_form.validate_on_submit():
+    if add_wallet_form.validate_on_submit():
         #  при нажатии кнопки создать
 
-        wallet_name = addwallet_form.name.data
-        balance = addwallet_form.balance.data
-        main_currency = addwallet_form.main_currency.data
+        wallet_name = add_wallet_form.name.data
+        balance = add_wallet_form.balance.data
+        main_currency = add_wallet_form.main_currency.data
         wallet_color = request.form.get('walletcolor')
         # print(wallet_name, balance, main_currency)
 
@@ -357,7 +359,7 @@ def cabinet_wallets_page():
 
         if have_errors:
             return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
-                            sidebar_elements=sidebar_elements, form=addwallet_form, input_errors=input_errors,
+                            sidebar_elements=sidebar_elements, form=add_wallet_form, input_errors=input_errors,
                                    wallets=wallets_list)
 
         try:
@@ -378,27 +380,43 @@ def cabinet_wallets_page():
         return redirect('/cabinet/wallets')
 
     return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
-                           sidebar_elements=sidebar_elements, form=addwallet_form, input_errors=input_errors, wallets=wallets_list)
+                           sidebar_elements=sidebar_elements, form=add_wallet_form, input_errors=input_errors, wallets=wallets_list)
 
 
-@app.route('/cabinet/operations')
+@app.route('/cabinet/transactions')
 @login_required
-def cabinet_operations_page():
+def cabinet_transactions_page():
     current_user = flask_login.current_user
     if not current_user.is_authenticated:
         return redirect('/login')
 
     page_title = "Операции"
     message = ""
-    html = "cabinet_operations_page.html"
+    html = "cabinet_transactions_page.html"
     have_errors = False
     avatar_path = get_avatar_from_db(current_user)
     sidebar_elements = get_deepcopy_dict(CABINET_PAGE_SIDEBAR_ELEMENTS)  # полная копия
 
     set_sidebar_a_active_class(sidebar_elements, page_title)  # устновить синим
 
+    input_errors = CABINET_TRANSACTIONS_PAGE_ADD_TRANSACTION_MODAL_INPUT_ERRORS  # ошибки
+
+    add_transaction_form = AddTransactionForm()  # форма
+    wallets_list = get_wallets_list(Wallet, current_user)  # список счетов
+    wallets_names = get_wallets_names(wallets_list)  # список названий кошельков
+
+    add_transaction_form.wallet.choices = wallets_names  # установить choices для wallet в форму
+
+    if add_transaction_form.validate_on_submit():
+        #  при нажатии кнопки создать
+
+        wallet_name = add_wallet_form.name.data
+        balance = add_wallet_form.balance.data
+        main_currency = add_wallet_form.main_currency.data
+        wallet_color = request.form.get('walletcolor')
+
     return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
-                           sidebar_elements=sidebar_elements)
+                           sidebar_elements=sidebar_elements, form=add_transaction_form, input_errors=input_errors)
 
 
 @app.route('/cabinet/income')
