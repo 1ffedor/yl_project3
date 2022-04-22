@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block header %}
+<header>
+    <!-- Sidebar -->
+    <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
+        <div class="position-sticky">
+            <div class="list-group list-group-flush mx-3 mt-4">
+                {% for key in sidebar_elements %}
+                <a href="{{ sidebar_elements[key]['href'] }}" class="{{ sidebar_elements[key]['a_class'] }}" aria-current="true">
+                    <i class="{{ sidebar_elements[key]['i_class'] }}"></i><span>{{ sidebar_elements[key]['text'] }}</span>
+                </a>
+                
+<!--
+                <a href="#" class="list-group-item list-group-item-action py-2 ripple active" aria-current="true">
+                    <i class="fas fa-tachometer-alt fa-fw me-3"></i><span>Главная</span>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action py-2 ripple">
+                    <i class="fas fa-chart-area fa-fw me-3"></i><span>Мой профиль</span>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action py-2 ripple" aria-current="true">
+                    <i class="fas fa-tachometer-alt fa-fw me-3"></i><span>Счета</span>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action py-2 ripple" aria-current="true">
+                    <i class="fas fa-tachometer-alt fa-fw me-3"></i><span>Графики</span>
+                </a>
+-->
+                {% endfor %}
+            </div>
+        </div>
+    </nav>
+    <!-- Sidebar -->
+
+    <!-- Navbar -->
+    <nav id="main-navbar" class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+        <!-- Container wrapper -->
+        <div class="container-fluid">
+            <!-- Toggle button -->
+            <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Brand -->
+            <a class="navbar-brand" href="#">
+                <img src="https://mdbootstrap.com/img/logo/mdb-transaprent-noshadows.png" height="25" alt="Mylbudget" loading="lazy"/>
+            </a>
+<!--            &lt;!&ndash; Search form &ndash;&gt;-->
+<!--            <form class="d-none d-md-flex input-group w-auto my-auto">-->
+<!--                <input-->
+<!--                        autocomplete="off"-->
+<!--                        type="search"-->
+<!--                        class="form-control rounded"-->
+<!--                        placeholder='Search (ctrl + "/" to focus)'-->
+<!--                        style="min-width: 225px"-->
+<!--                />-->
+<!--                <span class="input-group-text border-0"-->
+<!--                ><i class="fas fa-search"></i-->
+<!--                ></span>-->
+<!--            </form>-->
+
+            <!-- Right links -->
+            <ul class="navbar-nav ms-auto d-flex flex-row">
+                <!-- Notification dropdown -->
+                <!-- Icon -->
+                <!-- Icon -->
+<!--
+                <li class="nav-item me-3 me-lg-0 my-auto">
+                    <a class="nav-link" href="#">
+                        <i class="fab fa-telegram"></i>
+                    </a>
+                </li>
+-->
+                <li class="nav-item me-3 me-lg-3 my-auto">
+                    <h5 class="my-auto">{{ user }}</h5>
+                </li>
+                <!-- Avatar -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle hidden-arrow d-flex align-items-center" href="#" id="navbarDropdownMenuLink" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
+                        <img src="{{ url_for('static', filename=avatar_path) }}" class="rounded-circle" height="36" width="36" alt="" loading="lazy"/>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+<!--
+                        <li><a class="dropdown-item" href="#">My profile</a></li>
+                        <li><a class="dropdown-item" href="#">Settings</a></li>
+-->
+                        <li><a class="dropdown-item" href="/logout">Выйти</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <!-- Container wrapper -->
+    </nav>
+    <!-- Navbar -->
+</header>
+{% endblock %}
+
+{% block pagecontent %}
+<div class="container-fluid" id="cabinetPageContent">
+    <div class="row mx-auto">
+        <div class="card" id="pagenameCard">
+            <!--                заголовок-->
+            <div class="card-header my-auto d-flex justify-content-between">
+                <h2 class="card-title my-auto">
+                    Операции
+                </h2>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addOperationModal">
+                  Добавить операцию
+                </button>
+            </div>
+        </div>
+    </div>
+        <!-- Добавить счёт -->
+    <div class="modal fade" id="addOperationModal" tabindex="-1" aria-labelledby="addOperationLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-center">
+                    <h2 class="modal-title my-auto mx-auto" id="addOperationLabel">
+                        Добавление операции
+                    </h2>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeModal"></button>
+                <div class="modal-body">
+                    <form action="" method="post" enctype=multipart/form-data>
+                    {{ form.hidden_tag() }}
+                    <div class="row my-4 d-flex justify-content-center">
+                        <div class="col-lg-4 col-8 my-auto">
+                            <div class="form-outline">
+                                {{ form.transaction_sum(class="form-control " + input_errors["transaction_sum"]["errclass"], id="inputTransaction_sum", type="number", min="0", max="1000000000") }}
+                                <label class="form-label" for="inputTransaction_sum">Сумма *</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-4 my-auto">
+                            <div class="input-group">
+                                {{ form.currency(class="form-select rounded " + input_errors["currency"]["errclass"], id="Transaction_type") }}
+                                {% for error in form.currency.errors %}
+                                    <p class="alert alert-danger" role="alert">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row my-4">
+                        <div class="text-center">
+                            {{ form.submit(class="btn btn-primary", type="submit") }}
+        <!--                        <button type="submit" class="btn btn-primary">Зарегистрироваться</button>-->
+                        </div>
+                    </div>
+                </form>
+                </div>
+<!--
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary">Сохранить</button>
+                </div>
+-->
+            </div>
+        </div>
+    </div>
+    <div class="row mx-auto d-sm-flex justify-content-evenly">
+
+        <div class="card col-lg-7 col-9 my-2" id="budgetCard">
+            <!--                заголовок-->
+            <div class="card-header my-auto d-flex justify-content-between">
+                <h4 class="text-center my-auto"><strong>21 апреля, чт</strong></h4>
+                <h4 class="text-center my-auto"><strong>750 руб</strong></h4>
+            </div>
+            <!--                тело-->
+            <div class="card-body">
+                <div class="row d-flex justify-content-between">
+                    <div class="col-1 mx-auto">
+                        <p class="text-center">фото</p>
+                    </div>
+                    <div class="col-2 mx-auto">
+                        <p class="text-center">тип</p>
+                    </div>
+                    <div class="col-3 mx-auto">
+                        <p class="text-center">счёт</p>
+                    </div>
+                    <div class="col-3 mx-auto">
+                        <p class="text-center">название</p>
+                    </div>
+                    <div class="col-3 mx-auto">
+                        <p class="text-center">-1000 руб</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card col-lg-7 col-9 my-2" id="budgetCard">
+            <!--                заголовок-->
+            <div class="card-header my-auto d-flex justify-content-between">
+                <h4 class="text-center my-auto"><strong>21 апреля, чт</strong></h4>
+                <h4 class="text-center my-auto"><strong>750 руб</strong></h4>
+            </div>
+            <!--                тело-->
+            <div class="card-body">
+                <div class="row d-flex justify-content-between">
+                    <div class="col-1 mx-auto">
+                        <p class="text-center">фото</p>
+                    </div>
+                    <div class="col-2 mx-auto">
+                        <p class="text-center">тип</p>
+                    </div>
+                    <div class="col-3 mx-auto">
+                        <p class="text-center">счёт</p>
+                    </div>
+                    <div class="col-3 mx-auto">
+                        <p class="text-center">название</p>
+                    </div>
+                    <div class="col-3 mx-auto">
+                        <p class="text-center">-1000 руб</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

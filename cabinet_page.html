@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block header %}
+<header>
+    <!-- Sidebar -->
+    <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
+        <div class="position-sticky">
+            <div class="list-group list-group-flush mx-3 mt-4">
+                {% for key in sidebar_elements %}
+                <a href="{{ sidebar_elements[key]['href'] }}" class="{{ sidebar_elements[key]['a_class'] }}" aria-current="true">
+                    <i class="{{ sidebar_elements[key]['i_class'] }}"></i><span>{{ sidebar_elements[key]['text'] }}</span>
+                </a>
+                
+<!--
+                <a href="#" class="list-group-item list-group-item-action py-2 ripple active" aria-current="true">
+                    <i class="fas fa-tachometer-alt fa-fw me-3"></i><span>Главная</span>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action py-2 ripple">
+                    <i class="fas fa-chart-area fa-fw me-3"></i><span>Мой профиль</span>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action py-2 ripple" aria-current="true">
+                    <i class="fas fa-tachometer-alt fa-fw me-3"></i><span>Счета</span>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action py-2 ripple" aria-current="true">
+                    <i class="fas fa-tachometer-alt fa-fw me-3"></i><span>Графики</span>
+                </a>
+-->
+                {% endfor %}
+            </div>
+        </div>
+    </nav>
+    <!-- Sidebar -->
+
+    <!-- Navbar -->
+    <nav id="main-navbar" class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+        <!-- Container wrapper -->
+        <div class="container-fluid">
+            <!-- Toggle button -->
+            <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Brand -->
+            <a class="navbar-brand" href="#">
+                <img src="https://mdbootstrap.com/img/logo/mdb-transaprent-noshadows.png" height="25" alt="Mylbudget" loading="lazy"/>
+            </a>
+<!--            &lt;!&ndash; Search form &ndash;&gt;-->
+<!--            <form class="d-none d-md-flex input-group w-auto my-auto">-->
+<!--                <input-->
+<!--                        autocomplete="off"-->
+<!--                        type="search"-->
+<!--                        class="form-control rounded"-->
+<!--                        placeholder='Search (ctrl + "/" to focus)'-->
+<!--                        style="min-width: 225px"-->
+<!--                />-->
+<!--                <span class="input-group-text border-0"-->
+<!--                ><i class="fas fa-search"></i-->
+<!--                ></span>-->
+<!--            </form>-->
+
+            <!-- Right links -->
+            <ul class="navbar-nav ms-auto d-flex flex-row">
+                <!-- Notification dropdown -->
+                <!-- Icon -->
+                <!-- Icon -->
+<!--
+                <li class="nav-item me-3 me-lg-0 my-auto">
+                    <a class="nav-link" href="#">
+                        <i class="fab fa-telegram"></i>
+                    </a>
+                </li>
+-->
+                <li class="nav-item me-3 me-lg-3 my-auto">
+                    <h5 class="my-auto">{{ user }}</h5>
+                </li>
+                <!-- Avatar -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle hidden-arrow d-flex align-items-center" href="#" id="navbarDropdownMenuLink" role="button" data-mdb-toggle="dropdown" aria-expanded="false">
+                        <img src="{{ url_for('static', filename=avatar_path) }}" class="rounded-circle" height="36" width="36" alt="" loading="lazy"/>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+<!--
+                        <li><a class="dropdown-item" href="#">My profile</a></li>
+                        <li><a class="dropdown-item" href="#">Settings</a></li>
+-->
+                        <li><a class="dropdown-item" href="/logout">Выйти</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <!-- Container wrapper -->
+    </nav>
+    <!-- Navbar -->
+</header>
+{% endblock %}
+
+{% block pagecontent %}
+<div class="container-fluid" id="cabinetPageContent">
+    <div class="row mx-auto">
+        <div class="card" id="pagenameCard">
+            <!--                заголовок-->
+            <div class="card-header my-auto d-flex justify-content-between">
+                <h2 class="card-title my-auto">
+                    Личный кабинет
+                </h2>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWalletModal">
+                  Добавить счёт
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Добавить счёт -->
+    <div class="modal fade" id="addWalletModal" tabindex="-1" aria-labelledby="addWalletLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-center">
+                    <h2 class="modal-title my-auto mx-auto" id="addWalletLabel">
+                        Добавление счёта
+                    </h2>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeModal"></button>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mx-auto d-sm-flex justify-content-evenly">
+        <div class="card col-lg-5 my-2" id="budgetCard">
+            <!--                заголовок-->
+            <div class="card-header my-auto text-center">
+                <h3 class="my-auto">
+                    Бюджет
+                </h3>
+            </div>
+            <!--                тело-->
+            <div class="card-body d-sm-flex justify-content-between">
+
+            </div>
+        </div>
+        <div class="card col-lg-5 my-2" id="budgetCard">
+            <!--                заголовок-->
+            <div class="card-header my-auto text-center ">
+                <h3 class="my-auto">
+                    Операции
+                </h3>
+            </div>
+            <!--                тело-->
+            <div class="card-body d-sm-flex justify-content-between">
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
