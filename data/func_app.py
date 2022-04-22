@@ -5,6 +5,8 @@ import random
 import string
 import cv2
 from copy import deepcopy
+from data import db_session
+import random
 
 
 def user_is_authenticated(current_user):
@@ -66,6 +68,65 @@ def set_sidebar_a_active_class(dict_, elem_title):
     except Exception as e:
         print(f"error with set a active class")
         return dict_
+
+
+def get_wallets_list(Wallet, current_user):
+    wallets_list = []
+    try:
+        db_sess = db_session.create_session()
+        wallets = db_sess.query(Wallet).filter(Wallet.user_id == current_user.id).all()
+        for elem in wallets:
+            # print(el.wallet_name, el.balance)
+            wallets_list.append(
+                {
+                    "name": elem.wallet_name,
+                    "balance": beautiful_balance(elem.balance),
+                    "currency": elem.main_currency[0],
+                    "wallet_color": elem.wallet_color
+                }
+            )
+        return wallets_list
+    except Exception as e:
+        print(e)
+        print("some problems with get wallets list")
+
+
+def beautiful_balance(balance):
+    balance = str(balance)
+    s = list(balance)
+    for i in range(len(balance), 0, -3):
+        s.insert(i, ' ')
+    s = ''.join(s)
+    return s
+
+
+def hex_to_rgb(hex_color):
+    hex_color = hex_color.lstrip('#')
+    r, g, b = tuple(int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
+    return r, g, b
+
+
+def rgb_to_hex(r, g, b):
+    return '#%02x%02x%02x' % (r, g, b)
+
+
+def muted_color(r, g, b):
+    # менее контрастный цвет
+    # r, g, b = max(min(255, 180 + r // 255), r), max(min(255, 180 + g // 255), g), max(min(255, 180 + b // 255), b)
+    return r, g, b
+
+
+def get_random_wallet_color():
+    r, g, b = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
+    r, g, b = muted_color(r, g, b)
+    return r, g, b
+
+
+def get_wallet_color(hex_color):
+    r, g, b = hex_to_rgb(hex_color)
+    r, g, b = muted_color(r, g, b)
+    hex_color = rgb_to_hex(r, g, b)
+    return hex_color
 
 
 

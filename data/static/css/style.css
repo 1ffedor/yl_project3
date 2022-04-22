@@ -68,6 +68,10 @@ body {
   }
 }
 
+.wallet_img {
+/*    background: #DEBFFF;*/
+    border-radius: 10px;
+}
 /* Sidebar */
 .sidebar {
   position: fixed;

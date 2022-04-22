@@ -63,6 +63,12 @@ CABINET_PAGE_SIDEBAR_ELEMENTS = {
         "a_class": "list-group-item list-group-item-action py-2 ripple",
         "i_class": "fas fa-tachometer-alt fa-fw me-3",
         "text": "Счета"},
+    "Операции": {
+        "href": "/cabinet/operations",
+        "a_class": "list-group-item list-group-item-action py-2 ripple",
+        "i_class": "fas fa-tachometer-alt fa-fw me-3",
+        "text": "Операции"
+    },
     "Доходы": {
         "href": "/cabinet/income",
         "a_class": "list-group-item list-group-item-action py-2 ripple",
@@ -92,5 +98,19 @@ CABINET_WALLETS_PAGE_ADD_WALLET_MODAL_INPUT_ERRORS = {
         "invalid-feedback": ""}
 }
 
+CABINET_WALLETS_PAGE_WALLETS_LIST = [
+    {
+        "name": "visa"
+    },
+    {
+        "name": "123"
+    },
+    {
+        "name": "2"
+    },
+    {
+        "name": "1243"
+    }
+]
 
 

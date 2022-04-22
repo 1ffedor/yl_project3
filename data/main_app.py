@@ -1,5 +1,7 @@
 from data import db_session
 from data.users import User
+from data.wallets import Wallet
+from data.transactions import Transaction
 from flask import Flask, url_for, render_template, redirect, request
 import flask_login
 from flask_login import LoginManager, login_user, login_required, logout_user
@@ -232,7 +234,6 @@ def login_page():
     if log_form.validate_on_submit():
         # данные из полей
         email = log_form.email.data.lower()
-        print(email)
         password = log_form.password.data
         remember_me = log_form.remember_me.data
         # print(remember_me)
@@ -310,7 +311,7 @@ def cabinet_menu_page():
     # return redirect('/login')
 
 
-@app.route('/cabinet/wallets')
+@app.route('/cabinet/wallets', methods=["GET", "POST"])
 @login_required
 def cabinet_wallets_page():
     current_user = flask_login.current_user
@@ -321,6 +322,11 @@ def cabinet_wallets_page():
     message = ""
     html = "cabinet_wallets_page.html"
     have_errors = False
+
+    my_0 = "my-0"
+    is_valid = f"{my_0} {IS_VALID}"  # если прошла проверку
+    is_invalid = IS_INVALID  # иначе
+
     avatar_path = get_avatar_from_db(current_user)
     sidebar_elements = get_deepcopy_dict(CABINET_PAGE_SIDEBAR_ELEMENTS)  # полная копия
 
@@ -328,9 +334,71 @@ def cabinet_wallets_page():
 
     addwallet_form = AddWalletForm()
     input_errors = get_deepcopy_dict(CABINET_WALLETS_PAGE_ADD_WALLET_MODAL_INPUT_ERRORS)
+    wallets_list = get_wallets_list(Wallet, current_user)
+
+    if addwallet_form.validate_on_submit():
+        #  при нажатии кнопки создать
+
+        wallet_name = addwallet_form.name.data
+        balance = addwallet_form.balance.data
+        main_currency = addwallet_form.main_currency.data
+        wallet_color = request.form.get('walletcolor')
+        # print(wallet_name, balance, main_currency)
+
+        if not str(balance).isdigit():
+            have_errors = True
+            input_form = "balance"
+
+            message = "Могут быть использованы только цифры!"
+
+            # красная рамка
+            input_errors[input_form]["errclass"] = is_invalid
+            input_errors[input_form]["invalid-feedback"] = message
+
+        if have_errors:
+            return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
+                            sidebar_elements=sidebar_elements, form=addwallet_form, input_errors=input_errors,
+                                   wallets=wallets_list)
+
+        try:
+            db_sess = db_session.create_session()
+            wallet = Wallet(user_id=current_user.id,
+                            wallet_name=wallet_name,
+                            balance=balance,
+                            main_currency=main_currency,
+                            wallet_color=get_wallet_color(wallet_color))
+            db_sess.add(wallet)
+            transaction = Transaction(user_id=current_user.id, wallet_id=wallet.id, transaction_sum=100, currency=main_currency)
+            db_sess.add(transaction)
+            db_sess.commit()
+        except Exception as e:
+            print(e)
+            print("some problems with add wallet")
+
+        return redirect('/cabinet/wallets')
 
     return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
-                           sidebar_elements=sidebar_elements, form=addwallet_form, input_errors=input_errors)
+                           sidebar_elements=sidebar_elements, form=addwallet_form, input_errors=input_errors, wallets=wallets_list)
+
+
+@app.route('/cabinet/operations')
+@login_required
+def cabinet_operations_page():
+    current_user = flask_login.current_user
+    if not current_user.is_authenticated:
+        return redirect('/login')
+
+    page_title = "Операции"
+    message = ""
+    html = "cabinet_operations_page.html"
+    have_errors = False
+    avatar_path = get_avatar_from_db(current_user)
+    sidebar_elements = get_deepcopy_dict(CABINET_PAGE_SIDEBAR_ELEMENTS)  # полная копия
+
+    set_sidebar_a_active_class(sidebar_elements, page_title)  # устновить синим
+
+    return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
+                           sidebar_elements=sidebar_elements)
 
 
 @app.route('/cabinet/income')
