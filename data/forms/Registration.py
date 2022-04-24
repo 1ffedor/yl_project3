@@ -12,4 +12,5 @@ class RegisterForm(FlaskForm):
     # валюта
     avatar = FileField("Фото профиля")
     main_currency = SelectField('Валюта', choices=REGISTRATION_PAGE_CURRENCIES_LIST)
+    timezone = SelectField('Часовой пояс', choices=REGISTRATION_PAGE_TIMEZONES_LIST, default=TIMEZONE_DEFAULT)
     submit = SubmitField('Зарегистрироваться')

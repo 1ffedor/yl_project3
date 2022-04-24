@@ -5,6 +5,8 @@ AVATAR_UPLOAD_FOLDER = r"static/img/avatars"
 AVATARS_UPLOAD_URL_FOR_FOLDER = r"img/avatars"
 AVATAR_FILENAME_DEFAULT = "default.jpg"
 AVATAR_ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+TIMEZONE_DEFAULT = "UTC +3"  # стандартный часовой пояс
+TRANSACTION_CATEGORIES_LIST = ["Расход", "Доход"]
 
 
 # START_PAGE
@@ -31,11 +33,15 @@ REGISTRATION_PAGE_INPUT_ERRORS = {
     "main_currency": {
         "errclass": "",
         "invalid-feedback": ""},
+    "timezone": {
+        "errclass": "",
+        "invalid-feedback": ""},
     "avatar": {
         "errclass": "",
         "invalid-feedback": ""}
 }
 REGISTRATION_PAGE_CURRENCIES_LIST = ["₽ (RUB)", "$ (USD)", "€ (EUR)"]  # список валют при регистрации
+REGISTRATION_PAGE_TIMEZONES_LIST = [f"UTC +{zone}" if zone >= 0 else f"UTC {zone}" for zone in range(-11, 13)]  # список часовых поясов
 
 
 # LOGIN_PAGE

@@ -17,6 +17,7 @@ class User(SqlAlchemyBase, UserMixin):
     username = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=False)
     avatar_filename = sqlalchemy.Column(sqlalchemy.String, default="default.jpg")
     main_currency = sqlalchemy.Column(sqlalchemy.String, default="rub")
+    timezone = sqlalchemy.Column(sqlalchemy.String, default="UTC +3")
     hashed_password = sqlalchemy.Column(sqlalchemy.String)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime,
                                       default=datetime.datetime.now)

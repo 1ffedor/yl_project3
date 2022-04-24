@@ -143,6 +143,26 @@
                     <div class="row my-4">
                         <div class="col-md-6 mx-auto">
                             <div class="input-group">
+                                <label class="col-form-label col-7">Часовой пояс: *</label>
+                                {{ form.timezone(class="form-select rounded " + input_errors["timezone"]["errclass"], id="selectTimezone") }} 
+                                {% for error in form.timezone.errors %}
+                                    <p class="alert alert-danger" role="alert">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+        <!--
+                                <select class="form-select col-3" id="selectCurrency" required>
+                                    <option selected><i class=""></i>RUB</option>
+                                    <option>USD</option>
+                                    <option>EUR</option>
+                                </select>
+        -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row my-4">
+                        <div class="col-md-6 mx-auto">
+                            <div class="input-group">
                                 <label class="col-form-label col-lg-3 col-12">Аватар:</label>
                                 {{ form.avatar(class="form-control " + input_errors["avatar"]["errclass"], id="Avatar", accept=".jpg, .png") }} 
                                 {% for error in form.avatar.errors %}

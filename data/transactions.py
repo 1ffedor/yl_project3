@@ -15,12 +15,12 @@ class Transaction(SqlAlchemyBase, UserMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     user_id = sqlalchemy.Column(sqlalchemy.Integer,
                                 sqlalchemy.ForeignKey("users.id"))
-    wallet_id = sqlalchemy.Column(sqlalchemy.Integer,
-                                sqlalchemy.ForeignKey("wallets.id"))
+    wallet_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("wallets.id"))
     transaction_sum = sqlalchemy.Column(sqlalchemy.Integer)
     currency = sqlalchemy.Column(sqlalchemy.String)
-    modified_date = sqlalchemy.Column(sqlalchemy.DateTime,
-                                      default=datetime.datetime.now)
+    comment = sqlalchemy.Column(sqlalchemy.String)
+    transaction_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+
     user = orm.relation('User')
     wallet = orm.relation('Wallet')
 

@@ -80,6 +80,7 @@ def get_wallets_list(Wallet, current_user):
             wallets_list.append(
                 {
                     "name": elem.wallet_name,
+                    "id": elem.id,
                     "balance": beautiful_balance(elem.balance),
                     "currency": elem.main_currency[0],
                     "wallet_color": elem.wallet_color
@@ -89,6 +90,24 @@ def get_wallets_list(Wallet, current_user):
     except Exception as e:
         print(e)
         print("some problems with get wallets list")
+
+
+def get_wallets_names(wallets_list):
+    arr = []
+    try:
+        for el in wallets_list:
+            # arr.append(el["name"])
+            arr.append(f"""{el["name"]} ({el["currency"][0]})""")
+        return arr
+    except:
+        print("some problems  with get wallets_list")
+
+
+def get_wallet_id_by_name(wallet_name, wallets_list):
+    for wallet in wallets_list:
+        if wallet["name"] == wallet_name:
+            return wallet["id"]
+    return None
 
 
 def beautiful_balance(balance):
@@ -128,15 +147,6 @@ def get_wallet_color(hex_color):
     hex_color = rgb_to_hex(r, g, b)
     return hex_color
 
-
-def get_wallets_names(wallets_list):
-    arr = []
-    try:
-        for el in wallets_list:
-            arr.append(el["name"])
-        return arr
-    except:
-        print("some problems  with get wallets_list")
 
 
 

@@ -96,13 +96,15 @@ def registration_page():
         username = reg_form.username.data
         password = reg_form.password.data
         password_again = reg_form.password_again.data
-        main_currency = reg_form.main_currency.data
+        main_currency = reg_form.main_currency.data[0]
+        timezone = reg_form.timezone.data
+        # print(timezone)
         avatar = reg_form.avatar.data
         avatar_filename = ""
 
         for key in input_errors.keys():
             # проход по всем инпутам и даем им si valid
-            if key != "main_currency" and key != "avatar":
+            if key != "main_currency" and key != "avatar" and key != "timezone":
                 # кроме валюты и аватара, чтобы галочка не мешала
                 input_errors[key]["errclass"] = is_valid
 
@@ -180,7 +182,7 @@ def registration_page():
             return render_template(html, page_title=page_title, form=reg_form, input_errors=input_errors)
 
         # иначе записываем в бд и редиректим
-        user = User(email=email, username=username, main_currency=main_currency)
+        user = User(email=email, username=username, main_currency=main_currency, timezone=timezone)
         user.set_password(password)
         user.set_avatar_filename(avatar, avatar.filename)
         db_sess.add(user)
@@ -343,7 +345,7 @@ def cabinet_wallets_page():
 
         wallet_name = add_wallet_form.name.data
         balance = add_wallet_form.balance.data
-        main_currency = add_wallet_form.main_currency.data
+        main_currency = add_wallet_form.main_currency.data[0]
         wallet_color = request.form.get('walletcolor')
         # print(wallet_name, balance, main_currency)
 
@@ -370,8 +372,6 @@ def cabinet_wallets_page():
                             main_currency=main_currency,
                             wallet_color=get_wallet_color(wallet_color))
             db_sess.add(wallet)
-            transaction = Transaction(user_id=current_user.id, wallet_id=wallet.id, transaction_sum=100, currency=main_currency)
-            db_sess.add(transaction)
             db_sess.commit()
         except Exception as e:
             print(e)
@@ -383,7 +383,7 @@ def cabinet_wallets_page():
                            sidebar_elements=sidebar_elements, form=add_wallet_form, input_errors=input_errors, wallets=wallets_list)
 
 
-@app.route('/cabinet/transactions')
+@app.route('/cabinet/transactions', methods=["GET", "POST"])
 @login_required
 def cabinet_transactions_page():
     current_user = flask_login.current_user
@@ -406,17 +406,39 @@ def cabinet_transactions_page():
     wallets_names = get_wallets_names(wallets_list)  # список названий кошельков
 
     add_transaction_form.wallet.choices = wallets_names  # установить choices для wallet в форму
+    # add_transaction_form.wallet(option_attr={"customselect-0": {"data-id": "value"}})
 
     if add_transaction_form.validate_on_submit():
         #  при нажатии кнопки создать
 
-        wallet_name = add_wallet_form.name.data
-        balance = add_wallet_form.balance.data
-        main_currency = add_wallet_form.main_currency.data
-        wallet_color = request.form.get('walletcolor')
+        transaction_sum = add_transaction_form.transaction_sum.data
+        wallet = add_transaction_form.wallet.data
+        currency = wallet[-2]
+        transaction_type = add_transaction_form.transaction_type.data
+        transaction_date = add_transaction_form.transaction_date.data
+        comment = add_transaction_form.comment.data
+
+        wallet_id = get_wallet_id_by_name(wallet[:-4], wallets_list)  # получим id кошелька по названию,
+        # -4, чтобы не включалась валютва
+
+        try:
+            db_sess = db_session.create_session()
+            transaction = Transaction(user_id=current_user.id,
+                            wallet_id=wallet_id,
+                            transaction_sum=transaction_sum,
+                            currency=currency,
+                            transaction_date=transaction_date, comment=comment)
+            db_sess.add(transaction)
+            db_sess.commit()
+        except Exception as e:
+            print(e)
+            print("some problems with add transaction")
+
+        return redirect('/cabinet/wallets')
 
     return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
-                           sidebar_elements=sidebar_elements, form=add_transaction_form, input_errors=input_errors)
+                           sidebar_elements=sidebar_elements, form=add_transaction_form, input_errors=input_errors,
+                           wallets_names=wallets_names)
 
 
 @app.route('/cabinet/income')
