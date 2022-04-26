@@ -414,12 +414,13 @@ def cabinet_transactions_page():
         transaction_sum = add_transaction_form.transaction_sum.data
         wallet = add_transaction_form.wallet.data
         currency = wallet[-2]
-        transaction_type = add_transaction_form.transaction_type.data
+        transaction_category = add_transaction_form.transaction_expenses_category.data
         transaction_date = add_transaction_form.transaction_date.data
         comment = add_transaction_form.comment.data
 
         wallet_id = get_wallet_id_by_name(wallet[:-4], wallets_list)  # получим id кошелька по названию,
         # -4, чтобы не включалась валютва
+        print()
 
         try:
             db_sess = db_session.create_session()

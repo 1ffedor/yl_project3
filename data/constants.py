@@ -137,13 +137,18 @@ CABINET_TRANSACTIONS_PAGE_ADD_TRANSACTION_MODAL_INPUT_ERRORS = {
     "name": {
         "errclass": "",
         "invalid-feedback": ""},
-    "category": {
+    "transaction_income_category": {
         "errclass": "",
         "invalid-feedback": ""},
     "comment": {
         "errclass": "",
+        "invalid-feedback": ""},
+    "transaction_expenses_category": {
+        "errclass": "",
         "invalid-feedback": ""}
 }
 
+CABINET_TRANSACTIONS_PAGE_EXPENSES_CATEGORIES_LIST = ["расход1"]  # РАСХОДЫ СПИСОК
+CABINET_TRANSACTIONS_PAGE_INCOME_CATEGORIES_LIST = ["доход1"]  # доходы список
 # CABINET_TRANSACTIONS_PAGE_WALLETS_LIST = ["dfsatgrsyhgcdfhdytrdyhfxhnbcfvhnvn", "visa", "dfsatgrsyhgcdfhdytrdyhfxhnbcfvhnvn"]
 

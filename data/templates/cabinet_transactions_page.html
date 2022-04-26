@@ -103,24 +103,36 @@
                 <h2 class="card-title my-auto">
                     Операции
                 </h2>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addOperationModal">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionExpensesModal">
                   Добавить операцию
                 </button>
             </div>
         </div>
     </div>
         <!-- Добавить счёт -->
-    <div class="modal fade" id="addOperationModal" tabindex="-1" aria-labelledby="addOperationLabel" aria-hidden="true">
+    <div class="modal fade" id="addTransactionExpensesModal" tabindex="-1" aria-labelledby="addTransactionExpensesLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header d-flex justify-content-center">
-                    <h2 class="modal-title my-auto mx-auto" id="addOperationLabel">
-                        Добавление операции
+                    <h2 class="modal-title my-auto mx-auto" id="addTransactionExpensesLabel">
+                        Добавление расхода
                     </h2>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeModal"></button>
                 <div class="modal-body">
                     {% if wallets_names %}
+                    
+                    <div class="row d-flex justify-content-center mt-0 mb-2">
+                        <div class="col-lg-6 mx-auto d-flex justify-content-evenly">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionExpensesModal" id="btnExpensesExpensesModal">
+                              Расход
+                            </button>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionIncomeModal" id="btnIncomeExpensesModal">
+                              Доход
+                            </button>
+                        </div>
+                    </div>
+                    
                     <form action="" method="post" enctype=multipart/form-data>
                     {{ form.hidden_tag() }}
                     <div class="row my-4 d-flex justify-content-center">
@@ -155,23 +167,164 @@
                         </div>
                         
                         <script type="text/javascript">
-                         document.getElementById('currency').innerHTML = document.getElementById("selectWallet").value[document.getElementById("selectWallet").value.length - 2];
-                         document.getElementById("selectWallet").addEventListener("change", function(){
-                             document.getElementById('currency').innerHTML = this.value[this.value.length - 2];   
-                            });
+                             document.getElementById('currency').innerHTML = document.getElementById("selectWallet").value[document.getElementById("selectWallet").value.length - 2];
+                             document.getElementById("selectWallet").addEventListener("change", function(){
+                                 document.getElementById('currency').innerHTML = this.value[this.value.length - 2];   
+                                });
+                            document.getElementById("btnExpensesExpensesModal").disabled = true;
+                            document.getElementById("btnIncomeExpensesModal").disabled = false; 
                         </script>
                         
                     </div>
                     <div class="row my-4 d-flex justify-content-center">
                         <div class="col-lg-2 col-4 ml-1 my-auto">
                             <div class="input-group my-auto">
-                                <label class="col-form-label text-center">Тип:</label>
+                                <label class="col-form-label text-center">Категория:</label>
                             </div>
                         </div>
                         <div class="col-lg-4 col-8 my-auto">
                             <div class="input-group my-auto">
-                                {{ form.transaction_type(class="form-select rounded " + input_errors["transaction_type"]["errclass"], id="selectTransactionType") }}
-                                {% for error in form.transaction_type.errors %}
+                                {{ form.transaction_expenses_category(class="form-select rounded " + input_errors["transaction_expenses_category"]["errclass"], id="selectTransactionCategory") }}
+                                {% for error in form.transaction_expenses_category.errors %}
+                                    <p class="alert alert-danger" role="alert">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row my-4 d-flex justify-content-center">
+                        <div class="col-lg-2 col-4 ml-1 my-auto">
+                            <div class="input-group my-auto">
+                                <label class="col-form-label text-center">Дата:</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-8 my-auto">
+                            <div class="input-group my-auto">
+                                {{ form.transaction_date(class="form-control rounded", id="selectTransactionDate") }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row my-4  d-flex justify-content-center">
+                        <div class="col-lg-6 mx-auto">
+        <!--                        is-valid зеленое my-0 нет отступов по y-->
+                            <div class="form-outline">
+                                {{ form.comment(class="form-control " + input_errors["comment"]["errclass"], id="inputComment", type="text", maxlength="24") }}
+                                <div class="invalid-feedback">
+                                    {{ input_errors["comment"]["invalid-feedback"] }}
+                                </div>
+                                <label class="form-label" for="inputName">Комментарий</label>
+                                {% for error in form.comment.errors %}
+                                    <p class="alert alert-danger" role="alert">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row my-4">
+                        <div class="text-center">
+                            {{ form.submit(class="btn btn-primary", type="submit") }}
+        <!--                        <button type="submit" class="btn btn-primary">Зарегистрироваться</button>-->
+                        </div>
+                    </div>
+                </form>
+                {% else %}
+                    <div class="row my-4 d-flex justify-content-center">
+                        <div class="col-lg-12 col-8 my-auto">
+                            <h3 class="my-auto text-center">
+                                Счета не найдены! <a href="/cabinet/wallets">Создайте новый.</a>
+                            </h3>
+                        </div>
+                    </div>
+                {% endif %}
+                </div>
+<!--
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary">Сохранить</button>
+                </div>
+-->
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addTransactionIncomeModal" tabindex="-1" aria-labelledby="addTransactionIncomeLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-center">
+                    <h2 class="modal-title my-auto mx-auto" id="addTransactionIncomeLabel">
+                        Добавление дохода
+                    </h2>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeModal"></button>
+                <div class="modal-body">
+                    {% if wallets_names %}
+                    
+                    <div class="row d-flex justify-content-center mt-0 mb-2">
+                        <div class="col-lg-6 mx-auto d-flex justify-content-evenly">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionExpensesModal" id="btnExpensesIncomeModal">
+                              Расход
+                            </button>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionIncomeModal" id="btnIncomeIncomeModal">
+                              Доход
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <form action="" method="post" enctype=multipart/form-data>
+                    {{ form.hidden_tag() }}
+                    <div class="row my-4 d-flex justify-content-center">
+                        <div class="col-lg-5 col-8 my-auto">
+                            <div class="form-outline">
+                                {{ form.transaction_sum(class="form-control " + input_errors["transaction_sum"]["errclass"], id="inputTransaction_sum", type="number", min="0", max="1000000000") }}
+                                <label class="form-label" for="inputTransaction_sum">Сумма *</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-4 my-auto">
+                            <div class="input-group">
+                                <h4 class="form-label my-auto text-center" id="currency" name="currencytext">
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row my-4 d-flex justify-content-center">
+                        <div class="col-lg-2 col-4 ml-1 my-auto">
+                            <div class="input-group my-auto">
+                                <label class="col-form-label text-center">Счёт:</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-8 my-auto">
+                            <div class="input-group my-auto">
+                                {{ form.wallet(class="form-select rounded " + input_errors["wallet"]["errclass"], id="selectWallet") }}
+                                {% for error in form.wallet.errors %}
+                                    <p class="alert alert-danger" role="alert">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <script type="text/javascript">
+                            document.getElementById('currency').innerHTML = document.getElementById("selectWallet").value[document.getElementById("selectWallet").value.length - 2];
+                            document.getElementById("selectWallet").addEventListener("change", function(){
+                             document.getElementById('currency').innerHTML = this.value[this.value.length - 2];   
+                            });
+                            document.getElementById("btnExpensesIncomeModal").disabled = false;
+                            document.getElementById("btnIncomeIncomeModal").disabled = true; 
+                        </script>
+                        
+                    </div>
+                    <div class="row my-4 d-flex justify-content-center">
+                        <div class="col-lg-2 col-4 ml-1 my-auto">
+                            <div class="input-group my-auto">
+                                <label class="col-form-label text-center">Категория:</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-8 my-auto">
+                            <div class="input-group my-auto">
+                                {{ form.transaction_income_category(class="form-select rounded " + input_errors["transaction_income_category"]["errclass"], id="selectTransactionCategory") }}
+                                {% for error in form.transaction_income_category.errors %}
                                     <p class="alert alert-danger" role="alert">
                                         {{ error }}
                                     </p>
