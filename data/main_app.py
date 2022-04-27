@@ -11,7 +11,7 @@ from constants import *
 from forms.login import LoginForm
 from forms.registration import RegisterForm
 from forms.addwallet import AddWalletForm
-from forms.addtransaction import AddTransactionForm
+from forms.addtransaction import AddTransactionExpensesForm, AddTransactionIncomeForm
 import json
 import datetime
 from func_app import *
@@ -182,7 +182,8 @@ def registration_page():
             return render_template(html, page_title=page_title, form=reg_form, input_errors=input_errors)
 
         # иначе записываем в бд и редиректим
-        user = User(email=email, username=username, main_currency=main_currency, timezone=timezone)
+        user = User(email=email, username=username, main_currency=main_currency, timezone=timezone,
+                    modified_date=get_utc_time())
         user.set_password(password)
         user.set_avatar_filename(avatar, avatar.filename)
         db_sess.add(user)
@@ -244,7 +245,8 @@ def login_page():
 
         for key in input_errors.keys():
             # проход по всем инпутам и даем им si valid
-            input_errors[key]["errclass"] = is_valid
+            if key != "password":
+                input_errors[key]["errclass"] = is_valid
 
         db_sess = db_session.create_session()
 
@@ -349,20 +351,39 @@ def cabinet_wallets_page():
         wallet_color = request.form.get('walletcolor')
         # print(wallet_name, balance, main_currency)
 
-        if not str(balance).isdigit():
-            have_errors = True
-            input_form = "balance"
-
-            message = "Могут быть использованы только цифры!"
-
-            # красная рамка
-            input_errors[input_form]["errclass"] = is_invalid
-            input_errors[input_form]["invalid-feedback"] = message
-
-        if have_errors:
-            return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
-                            sidebar_elements=sidebar_elements, form=add_wallet_form, input_errors=input_errors,
-                                   wallets=wallets_list)
+        # if not str(balance).isdigit():
+        #     have_errors = True
+        #     input_form = "balance"
+        #
+        #     message = "Могут быть использованы только цифры!"
+        #
+        #     # красная рамка
+        #     input_errors[input_form]["errclass"] = is_invalid
+        #     input_errors[input_form]["invalid-feedback"] = message
+        #
+        db_sess = db_session.create_session()
+        wallet = db_sess.query(Wallet).filter(
+            Wallet.wallet_name == wallet_name, Wallet.user_id == current_user.id).first()
+        if wallet:
+            wallet_name = new_wallet_name(Wallet, current_user, wallet_name)
+        #
+        # if wallet:
+        #     print(1)
+        #     have_errors = True
+        #     input_form = "name"
+        #
+        #     message = "Кошелёк с таким именем уже есть!"
+        #
+        #     # красная рамка
+        #     input_errors[input_form]["errclass"] = is_invalid
+        #     input_errors[input_form]["invalid-feedback"] = message
+        #
+        # if have_errors:
+        #     return render_template(html, page_title=page_title, user=current_user.username,
+        #                            avatar_path=avatar_path,
+        #                            sidebar_elements=sidebar_elements,
+        #                            form=add_wallet_form, input_errors=input_errors,
+        #                            wallets=wallets_list)
 
         try:
             db_sess = db_session.create_session()
@@ -380,7 +401,8 @@ def cabinet_wallets_page():
         return redirect('/cabinet/wallets')
 
     return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
-                           sidebar_elements=sidebar_elements, form=add_wallet_form, input_errors=input_errors, wallets=wallets_list)
+                           sidebar_elements=sidebar_elements, form=add_wallet_form, input_errors=input_errors,
+                           wallets=wallets_list)
 
 
 @app.route('/cabinet/transactions', methods=["GET", "POST"])
@@ -401,45 +423,90 @@ def cabinet_transactions_page():
 
     input_errors = CABINET_TRANSACTIONS_PAGE_ADD_TRANSACTION_MODAL_INPUT_ERRORS  # ошибки
 
-    add_transaction_form = AddTransactionForm()  # форма
+    add_transaction_expenses_form = AddTransactionExpensesForm()  # форма расходов
+    add_transaction_income_form = AddTransactionIncomeForm()  # форм доходов
+
     wallets_list = get_wallets_list(Wallet, current_user)  # список счетов
     wallets_names = get_wallets_names(wallets_list)  # список названий кошельков
 
-    add_transaction_form.wallet.choices = wallets_names  # установить choices для wallet в форму
-    # add_transaction_form.wallet(option_attr={"customselect-0": {"data-id": "value"}})
+    add_transaction_expenses_form.wallet.choices = wallets_names  # установить choices для wallet в форму
+    add_transaction_income_form.wallet.choices = wallets_names
 
-    if add_transaction_form.validate_on_submit():
-        #  при нажатии кнопки создать
+    get_transactions_list(Transaction, current_user)
 
-        transaction_sum = add_transaction_form.transaction_sum.data
-        wallet = add_transaction_form.wallet.data
+    if add_transaction_expenses_form.validate_on_submit():
+        #  при нажатии кнопки добавить расход
+        transaction_type = "expenses"
+
+        transaction_sum = add_transaction_expenses_form.transaction_sum.data
+        wallet = add_transaction_expenses_form.wallet.data
         currency = wallet[-2]
-        transaction_category = add_transaction_form.transaction_expenses_category.data
-        transaction_date = add_transaction_form.transaction_date.data
-        comment = add_transaction_form.comment.data
+        comment = add_transaction_expenses_form.comment.data
+        transaction_category = add_transaction_expenses_form.transaction_expenses_category.data
+        transaction_date = add_transaction_expenses_form.transaction_date.data  # время местное
 
         wallet_id = get_wallet_id_by_name(wallet[:-4], wallets_list)  # получим id кошелька по названию,
         # -4, чтобы не включалась валютва
-        print()
 
         try:
             db_sess = db_session.create_session()
-            transaction = Transaction(user_id=current_user.id,
-                            wallet_id=wallet_id,
-                            transaction_sum=transaction_sum,
-                            currency=currency,
+            transaction = Transaction(user_id=current_user.id, transaction_type=transaction_type,
+                            wallet_id=wallet_id, transaction_sum=transaction_sum, currency=currency,
+                            transaction_category=transaction_category,
+                            transaction_date=transaction_date, comment=comment)
+            db_sess.add(transaction)
+            db_sess.commit()
+
+        except Exception as e:
+            print(e)
+            print("some problems with add transaction expenses")
+
+        try:
+            deduct_money_from_wallet(Wallet, current_user, wallet_id, transaction_sum)
+        except Exception as e:
+            print(e)
+            print("some problems with deduct money")
+
+        return redirect('/cabinet/transactions')
+
+    elif add_transaction_income_form.validate_on_submit():
+        #  при нажатии кнопки добавить расход
+        transaction_type = "income"
+
+        transaction_sum = add_transaction_income_form.transaction_sum.data
+        wallet = add_transaction_income_form.wallet.data
+        currency = wallet[-2]
+        comment = add_transaction_income_form.comment.data
+        transaction_category = add_transaction_income_form.transaction_income_category.data
+        transaction_date = add_transaction_income_form.transaction_date.data
+
+        wallet_id = get_wallet_id_by_name(wallet[:-4], wallets_list)  # получим id кошелька по названию,
+        # -4, чтобы не включалась валютва
+
+        try:
+            db_sess = db_session.create_session()
+            transaction = Transaction(user_id=current_user.id, transaction_type=transaction_type,
+                            wallet_id=wallet_id, transaction_sum=transaction_sum, currency=currency,
+                            transaction_category=transaction_category,
                             transaction_date=transaction_date, comment=comment)
             db_sess.add(transaction)
             db_sess.commit()
         except Exception as e:
             print(e)
-            print("some problems with add transaction")
+            print("some problems with add transaction income")
 
-        return redirect('/cabinet/wallets')
+        try:
+            add_money_to_wallet(Wallet, current_user, wallet_id, transaction_sum)
+        except Exception as e:
+            print(e)
+            print("some problems with deduct money")
+
+        return redirect('/cabinet/transactions')
 
     return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
-                           sidebar_elements=sidebar_elements, form=add_transaction_form, input_errors=input_errors,
-                           wallets_names=wallets_names)
+                           sidebar_elements=sidebar_elements, expenses_form=add_transaction_expenses_form,
+                           income_form=add_transaction_income_form, input_errors=input_errors,
+                           wallets_names=wallets_names, max_time=get_transaction_max_time())
 
 
 @app.route('/cabinet/income')

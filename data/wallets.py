@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import sqlalchemy
 from .db_session import SqlAlchemyBase
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -20,7 +20,7 @@ class Wallet(SqlAlchemyBase, UserMixin):
     main_currency = sqlalchemy.Column(sqlalchemy.String, default="rub")
     wallet_color = sqlalchemy.Column(sqlalchemy.String)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime,
-                                      default=datetime.datetime.now)
+                                      default=datetime.now)
     user = orm.relation('User')
 
 

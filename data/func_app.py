@@ -7,6 +7,8 @@ import cv2
 from copy import deepcopy
 from data import db_session
 import random
+import pytz
+from datetime import datetime, timedelta
 
 
 def user_is_authenticated(current_user):
@@ -35,7 +37,7 @@ def create_random_filename(filename, name_len=8):
             filename = ''.join(random.sample(s, name_len)) + file_extension
             path_to_file = os.path.join(AVATAR_UPLOAD_FOLDER, filename)
     except Exception as e:
-        print("some problems with create_randm_name")
+        print("some problems with create_random_name")
         print(e)
         filename = "default.jpg"
 
@@ -110,6 +112,24 @@ def get_wallet_id_by_name(wallet_name, wallets_list):
     return None
 
 
+def new_wallet_name(Wallet, current_user, wallet_name):
+    wallet_name_def = wallet_name
+    db_sess = db_session.create_session()
+    wallet = db_sess.query(Wallet).filter(
+        Wallet.wallet_name == wallet_name, Wallet.user_id == current_user.id).first()
+    i = 2
+    while wallet and i < 30:
+        wallet_name = f"{wallet_name_def} ({i})"
+        i += 1
+        wallet = db_sess.query(Wallet).filter(
+            Wallet.wallet_name == wallet_name, Wallet.user_id == current_user.id).first()
+    if i >= 30:
+        s = string.ascii_lowercase + string.ascii_uppercase + string.digits
+        name_len = 8
+        wallet_name = ''.join(random.sample(s, name_len))
+    return wallet_name
+
+
 def beautiful_balance(balance):
     balance = str(balance)
     s = list(balance)
@@ -148,6 +168,102 @@ def get_wallet_color(hex_color):
     return hex_color
 
 
+def deduct_money_from_wallet(Wallet, current_user, wallet_id, expense_sum):
+    db_sess = db_session.create_session()
+    wallet = db_sess.query(Wallet).filter(Wallet.id == wallet_id, Wallet.user_id == current_user.id).first()
+    wallet.balance -= expense_sum
+    db_sess.commit()
+
+
+def add_money_to_wallet(Wallet, current_user, wallet_id, expense_sum):
+    db_sess = db_session.create_session()
+    wallet = db_sess.query(Wallet).filter(Wallet.id == wallet_id, Wallet.user_id == current_user.id).first()
+    wallet.balance += expense_sum
+    db_sess.commit()
+
+
+def get_utc_time():
+    # получить время по гринвичу
+    try:
+        utc_time = pytz.utc
+        datetime_utc = datetime.now(utc_time)
+        # datetime_utc = datetime.now(utc_time).strftime("%Y-%m-%d %H:%M:%S")
+        # print(datetime_utc)
+        return datetime_utc
+    except:
+        print("some problems with get utc time")
+        return datetime.now()
+
+
+def get_current_time(timezone="+0"):
+    try:
+        return get_utc_time() + timedelta(hours=int(timezone[-2:]))
+    except:
+        print("some problems with get current time")
+        return get_utc_time()
+
+
+def get_transaction_max_time(timezone="+3"):
+    max_time = get_utc_time() + timedelta(hours=int(timezone[-2:]))
+    return max_time.strftime("%Y-%m-%dT%H:%M:%S")
+
+
+def get_transactions_list(Transaction, current_user):
+    # сначала найдем последнюю дату
+    transactions_dict = {}
+    db_sess = db_session.create_session()
+    transactions_by_date_list = db_sess.query(Transaction).filter(
+        Transaction.user_id == current_user.id).order_by(Transaction.transaction_date).all()
+    transactions_by_date_list = transactions_by_date_list[::-1]
+    try:
+        transaction = transactions_by_date_list[0]
+        date = transaction.transaction_date.strftime("%Y-%m-%d")
+        print(date)
+
+        transactions_dict[date] = [
+                    {
+                        "id": transaction.id,
+                        "user_id": transaction.user_id,
+                        "wallet_id": transaction.wallet_id,
+                        "type": transaction.transaction_type,
+                        "category": transaction.transaction_category,
+                        "sum": transaction.transaction_sum,
+                        "currency": transaction.currency,
+                        "comment": transaction.comment
+                    }
+        ]
+        for transaction in transactions_by_date_list[1:]:
+            if transaction.transaction_date.strftime("%Y-%m-%d") == date:
+                transactions_dict[date].append(
+                    {
+                        "id": transaction.id,
+                        "user_id": transaction.user_id,
+                        "wallet_id": transaction.wallet_id,
+                        "type": transaction.transaction_type,
+                        "category": transaction.transaction_category,
+                        "sum": transaction.transaction_sum,
+                        "currency": transaction.currency,
+                        "comment": transaction.comment
+                    })
+            else:
+                date = transaction.transaction_date.strftime("%Y-%m-%d")
+
+                transactions_dict[date] = [
+                    {
+                        "id": transaction.id,
+                        "user_id": transaction.user_id,
+                        "wallet_id": transaction.wallet_id,
+                        "type": transaction.transaction_type,
+                        "category": transaction.transaction_category,
+                        "sum": transaction.transaction_sum,
+                        "currency": transaction.currency,
+                        "comment": transaction.comment
+                    }
+                ]
+        print(transactions_dict)
+    except Exception as e:
+        print(e)
+        print("some problemswith get transa list")
 
 
 

@@ -148,7 +148,9 @@ CABINET_TRANSACTIONS_PAGE_ADD_TRANSACTION_MODAL_INPUT_ERRORS = {
         "invalid-feedback": ""}
 }
 
-CABINET_TRANSACTIONS_PAGE_EXPENSES_CATEGORIES_LIST = ["расход1"]  # РАСХОДЫ СПИСОК
-CABINET_TRANSACTIONS_PAGE_INCOME_CATEGORIES_LIST = ["доход1"]  # доходы список
+CABINET_TRANSACTIONS_PAGE_EXPENSES_CATEGORIES_LIST = ["Продукты", "Транспорт", "ЖКХ", "Связь", "Образование",
+                                                      "Кафе", "Подарки", "Гаджеты", "Путешествия", "Досуг",
+                                                      "Другое "]  # РАСХОДЫ СПИСОК
+CABINET_TRANSACTIONS_PAGE_INCOME_CATEGORIES_LIST = ["Зарплата", "Дивиденты", "Подарок", "Другое"]  # доходы список
 # CABINET_TRANSACTIONS_PAGE_WALLETS_LIST = ["dfsatgrsyhgcdfhdytrdyhfxhnbcfvhnvn", "visa", "dfsatgrsyhgcdfhdytrdyhfxhnbcfvhnvn"]
 

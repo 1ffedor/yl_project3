@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import sqlalchemy
 from .db_session import SqlAlchemyBase
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -20,7 +20,7 @@ class User(SqlAlchemyBase, UserMixin):
     timezone = sqlalchemy.Column(sqlalchemy.String, default="UTC +3")
     hashed_password = sqlalchemy.Column(sqlalchemy.String)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime,
-                                      default=datetime.datetime.now)
+                                      default=datetime.now)
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
