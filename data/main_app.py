@@ -432,7 +432,8 @@ def cabinet_transactions_page():
     add_transaction_expenses_form.wallet.choices = wallets_names  # установить choices для wallet в форму
     add_transaction_income_form.wallet.choices = wallets_names
 
-    get_transactions_list(Transaction, current_user)
+    transactions_dict = get_transactions_dict(Transaction, Wallet, current_user)  # список транзакций для истории
+    day_transactions_sum_dict = get_day_transactions_sum(current_user, transactions_dict)  # сумма за день
 
     if add_transaction_expenses_form.validate_on_submit():
         #  при нажатии кнопки добавить расход
@@ -506,7 +507,8 @@ def cabinet_transactions_page():
     return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
                            sidebar_elements=sidebar_elements, expenses_form=add_transaction_expenses_form,
                            income_form=add_transaction_income_form, input_errors=input_errors,
-                           wallets_names=wallets_names, max_time=get_transaction_max_time())
+                           wallets_names=wallets_names, max_time=get_transaction_max_time(),
+                           transactions_dict=transactions_dict, day_transactions_sum_dict=day_transactions_sum_dict)
 
 
 @app.route('/cabinet/income')

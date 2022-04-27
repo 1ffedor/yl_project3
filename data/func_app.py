@@ -9,6 +9,7 @@ from data import db_session
 import random
 import pytz
 from datetime import datetime, timedelta
+import requests
 
 
 def user_is_authenticated(current_user):
@@ -79,12 +80,15 @@ def get_wallets_list(Wallet, current_user):
         wallets = db_sess.query(Wallet).filter(Wallet.user_id == current_user.id).all()
         for elem in wallets:
             # print(el.wallet_name, el.balance)
+            balance_main_currency = convert_to_main_currency(current_user, elem.main_currency[0], elem.balance)
             wallets_list.append(
                 {
                     "name": elem.wallet_name,
                     "id": elem.id,
                     "balance": beautiful_balance(elem.balance),
+                    "balance_main_currency": beautiful_balance(balance_main_currency),
                     "currency": elem.main_currency[0],
+                    "main_currency": current_user.main_currency,
                     "wallet_color": elem.wallet_color
                 }
             )
@@ -110,6 +114,17 @@ def get_wallet_id_by_name(wallet_name, wallets_list):
         if wallet["name"] == wallet_name:
             return wallet["id"]
     return None
+
+
+def get_wallet_name_by_id(Wallet, current_user, wallet_id):
+    try:
+        db_sess = db_session.create_session()
+        wallet = db_sess.query(Wallet).filter(
+            Wallet.id == wallet_id, Wallet.user_id == current_user.id).first()
+        return wallet.wallet_name
+    except:
+        print("some problems with get wallet name by id")
+        return ""
 
 
 def new_wallet_name(Wallet, current_user, wallet_name):
@@ -208,7 +223,21 @@ def get_transaction_max_time(timezone="+3"):
     return max_time.strftime("%Y-%m-%dT%H:%M:%S")
 
 
-def get_transactions_list(Transaction, current_user):
+def get_day_transactions(date):
+    # 27 апреля, четверг
+    day_num = date.day
+    month_num = date.month
+    month_text = MONTHS[int(month_num) - 1]
+    day_text = WEEK_DAYS[int(date.weekday())]
+    # print("{{{{{{")
+    # print(day_num)
+    # print(month_num)
+    # print(month_text)
+    # print(day_text)
+    return f"{day_num} {month_text}, {day_text}"
+
+
+def get_transactions_dict(Transaction, Wallet, current_user):
     # сначала найдем последнюю дату
     transactions_dict = {}
     db_sess = db_session.create_session()
@@ -217,53 +246,124 @@ def get_transactions_list(Transaction, current_user):
     transactions_by_date_list = transactions_by_date_list[::-1]
     try:
         transaction = transactions_by_date_list[0]
-        date = transaction.transaction_date.strftime("%Y-%m-%d")
-        print(date)
+        date = get_day_transactions(transaction.transaction_date)
+
+        wallet_name = get_wallet_name_by_id(Wallet, current_user, transaction.wallet_id)
+        if transaction.transaction_type == "expenses":
+            # расход
+            transaction_sum = beautiful_balance(f"-{transaction.transaction_sum}")
+            transaction_type = "Расход"
+        else:
+            transaction_sum = beautiful_balance(f"+{transaction.transaction_sum}")
+            transaction_type = "Доход"
 
         transactions_dict[date] = [
                     {
                         "id": transaction.id,
                         "user_id": transaction.user_id,
                         "wallet_id": transaction.wallet_id,
-                        "type": transaction.transaction_type,
+                        "wallet_name": wallet_name,
+                        "type": transaction_type,
                         "category": transaction.transaction_category,
-                        "sum": transaction.transaction_sum,
+                        "sum": transaction_sum,
                         "currency": transaction.currency,
                         "comment": transaction.comment
                     }
         ]
+
         for transaction in transactions_by_date_list[1:]:
-            if transaction.transaction_date.strftime("%Y-%m-%d") == date:
+            wallet_name = get_wallet_name_by_id(Wallet, current_user, transaction.wallet_id)
+            if transaction.transaction_type == "expenses":
+                # расход
+                transaction_sum = beautiful_balance(f"-{transaction.transaction_sum}")
+                transaction_type = "Расход"
+            else:
+                transaction_sum = beautiful_balance(f"+{transaction.transaction_sum}")
+                transaction_type = "Доход"
+            if get_day_transactions(transaction.transaction_date) == date:
                 transactions_dict[date].append(
                     {
                         "id": transaction.id,
                         "user_id": transaction.user_id,
                         "wallet_id": transaction.wallet_id,
-                        "type": transaction.transaction_type,
+                        "wallet_name": wallet_name,
+                        "type": transaction_type,
                         "category": transaction.transaction_category,
-                        "sum": transaction.transaction_sum,
+                        "sum": transaction_sum,
                         "currency": transaction.currency,
                         "comment": transaction.comment
                     })
             else:
-                date = transaction.transaction_date.strftime("%Y-%m-%d")
-
+                date = get_day_transactions(transaction.transaction_date)
                 transactions_dict[date] = [
                     {
                         "id": transaction.id,
                         "user_id": transaction.user_id,
                         "wallet_id": transaction.wallet_id,
-                        "type": transaction.transaction_type,
+                        "wallet_name": wallet_name,
+                        "type": transaction_type,
+                        "type": transaction_type,
                         "category": transaction.transaction_category,
-                        "sum": transaction.transaction_sum,
+                        "sum": transaction_sum,
                         "currency": transaction.currency,
                         "comment": transaction.comment
                     }
                 ]
-        print(transactions_dict)
+        return transactions_dict
     except Exception as e:
         print(e)
         print("some problemswith get transa list")
+        return {}
+
+
+def get_day_transactions_sum(current_user, transactions_dict):
+    day_transactions_sum_dict = {}
+    day_sum = 0
+    day_sum_text = ""
+    for date in transactions_dict.keys():
+        day_sum = 0
+        day_sum_text = ""
+        for transaction in transactions_dict[date]:
+            # конвертим в базовую валюту
+            current_currency = transaction["currency"]
+            sum_in_current_currency = int(''.join(transaction["sum"].split()))
+            transaction_sum = convert_to_main_currency(current_user, current_currency, sum_in_current_currency)
+            day_sum += transaction_sum
+        if day_sum > 0:
+            day_sum_text = f"+ {beautiful_balance(day_sum)} {current_user.main_currency}"
+        else:
+            day_sum_text = f"{beautiful_balance(day_sum)} {current_user.main_currency}"
+        day_transactions_sum_dict[date] = day_sum_text
+    return day_transactions_sum_dict
+
+
+def convert_to_main_currency(current_user, current_currency, sum_in_current_currency, transaction_date="latest"):
+    # конвертировать из текущей валюты в основную
+
+    currencies_api_names = {"₽": "rub",
+                            "$": "usd",
+                            "€": "eur"}
+    date_latest = "latest"  # последнее
+    # main_currency = "eur"
+    main_currency = currencies_api_names[current_user.main_currency]
+    current_currency = currencies_api_names[current_currency]
+    try:
+        if main_currency != current_currency:
+            api_request_latest = f"https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/" \
+                                 f"{date_latest}/currencies/{current_currency}.json"
+            response_latest = requests.get(api_request_latest).json()
+            koef_latest = float(response_latest[current_currency][main_currency])
+            sum_in_main_currency_latest = int(float(sum_in_current_currency) * koef_latest)
+            return sum_in_main_currency_latest
+        return sum_in_current_currency
+
+    except Exception as e:
+        print(e)
+        print("some problems with convetr to main curr")
+        return sum_in_current_currency
+
+
+
 
 
 
