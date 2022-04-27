@@ -197,6 +197,14 @@ def add_money_to_wallet(Wallet, current_user, wallet_id, expense_sum):
     db_sess.commit()
 
 
+def get_all_balance(current_user, wallets_list):
+    balance = 0
+    for wallet in wallets_list:
+        balance += int(''.join(wallet["balance_main_currency"].split()))
+        main_currency = current_user.main_currency
+    return f"{beautiful_balance(balance)} {main_currency}"
+
+
 def get_utc_time():
     # получить время по гринвичу
     try:
@@ -251,11 +259,13 @@ def get_transactions_dict(Transaction, Wallet, current_user):
         wallet_name = get_wallet_name_by_id(Wallet, current_user, transaction.wallet_id)
         if transaction.transaction_type == "expenses":
             # расход
-            transaction_sum = beautiful_balance(f"-{transaction.transaction_sum}")
+            transaction_sum = beautiful_balance(f"- {transaction.transaction_sum}")
             transaction_type = "Расход"
         else:
-            transaction_sum = beautiful_balance(f"+{transaction.transaction_sum}")
+            transaction_sum = beautiful_balance(f"+ {transaction.transaction_sum}")
             transaction_type = "Доход"
+
+        category_i_class = CABINET_TRANSACTIONS_PAGE_CATEGORIES_ICONS_LIST[transaction.transaction_category]
 
         transactions_dict[date] = [
                     {
@@ -265,21 +275,23 @@ def get_transactions_dict(Transaction, Wallet, current_user):
                         "wallet_name": wallet_name,
                         "type": transaction_type,
                         "category": transaction.transaction_category,
+                        "category_i_class": category_i_class,
                         "sum": transaction_sum,
                         "currency": transaction.currency,
-                        "comment": transaction.comment
-                    }
+                        "comment": transaction.comment,
+                        "time": transaction.transaction_date.strftime("%H:%M")}
         ]
 
         for transaction in transactions_by_date_list[1:]:
             wallet_name = get_wallet_name_by_id(Wallet, current_user, transaction.wallet_id)
             if transaction.transaction_type == "expenses":
                 # расход
-                transaction_sum = beautiful_balance(f"-{transaction.transaction_sum}")
+                transaction_sum = beautiful_balance(f"- {transaction.transaction_sum}")
                 transaction_type = "Расход"
             else:
-                transaction_sum = beautiful_balance(f"+{transaction.transaction_sum}")
+                transaction_sum = beautiful_balance(f"+ {transaction.transaction_sum}")
                 transaction_type = "Доход"
+            category_i_class = CABINET_TRANSACTIONS_PAGE_CATEGORIES_ICONS_LIST[transaction.transaction_category]
             if get_day_transactions(transaction.transaction_date) == date:
                 transactions_dict[date].append(
                     {
@@ -289,9 +301,11 @@ def get_transactions_dict(Transaction, Wallet, current_user):
                         "wallet_name": wallet_name,
                         "type": transaction_type,
                         "category": transaction.transaction_category,
+                        "category_i_class": category_i_class,
                         "sum": transaction_sum,
                         "currency": transaction.currency,
-                        "comment": transaction.comment
+                        "comment": transaction.comment,
+                        "time": transaction.transaction_date.strftime("%H:%M")
                     })
             else:
                 date = get_day_transactions(transaction.transaction_date)
@@ -302,11 +316,12 @@ def get_transactions_dict(Transaction, Wallet, current_user):
                         "wallet_id": transaction.wallet_id,
                         "wallet_name": wallet_name,
                         "type": transaction_type,
-                        "type": transaction_type,
                         "category": transaction.transaction_category,
+                        "category_i_class": category_i_class,
                         "sum": transaction_sum,
                         "currency": transaction.currency,
-                        "comment": transaction.comment
+                        "comment": transaction.comment,
+                        "time": transaction.transaction_date.strftime("%H:%M")
                     }
                 ]
         return transactions_dict
@@ -331,6 +346,8 @@ def get_day_transactions_sum(current_user, transactions_dict):
             day_sum += transaction_sum
         if day_sum > 0:
             day_sum_text = f"+ {beautiful_balance(day_sum)} {current_user.main_currency}"
+        elif day_sum != 0:
+            day_sum_text = f"- {beautiful_balance(day_sum)[1:]} {current_user.main_currency}"
         else:
             day_sum_text = f"{beautiful_balance(day_sum)} {current_user.main_currency}"
         day_transactions_sum_dict[date] = day_sum_text

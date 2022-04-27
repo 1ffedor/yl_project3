@@ -153,10 +153,23 @@ CABINET_TRANSACTIONS_PAGE_ADD_TRANSACTION_MODAL_INPUT_ERRORS = {
 
 CABINET_TRANSACTIONS_PAGE_EXPENSES_CATEGORIES_LIST = \
     ["Продукты", "Транспорт", "ЖКХ", "Связь", "Образование",
-      "Кафе", "Подарки", "Гаджеты", "Путешествия", "Досуг", "Другое "]  # РАСХОДЫ СПИСОК
+      "Кафе", "Подарки", "Гаджеты", "Путешествия", "Досуг", "Другое"]  # РАСХОДЫ СПИСОК
 CABINET_TRANSACTIONS_PAGE_INCOME_CATEGORIES_LIST = \
     ["Зарплата", "Дивиденты", "Подарок", "Другое"]  # доходы список
 # CABINET_TRANSACTIONS_PAGE_WALLETS_LIST = ["dfsatgrsyhgcdfhdytrdyhfxhnbcfvhnvn", "visa", "dfsatgrsyhgcdfhdytrdyhfxhnbcfvhnvn"]
-CABINET_TRANSACTIONS_PAGE_CATEGORIES_ICONS_LIST = [
-    ""
-]
+CABINET_TRANSACTIONS_PAGE_CATEGORIES_ICONS_LIST = {
+    "Продукты": "fa fa-shopping-basket",
+    "Транспорт": "fa fa-bus",
+    "ЖКХ": "fa fa-home",
+    "Связь": "fa fa-phone-square",
+    "Образование": "fa fa-graduation-cap",
+    "Кафе": "fa fa-coffee",
+    "Подарки": "fa fa-gift",
+    "Гаджеты": "fa fa-mobile",
+    "Путешествия": "fa fa-plane",
+    "Досуг": "fa fa-gamepad",
+    "Другое": "fa fa-navicon",
+    "Зарплата": "fa fa-credit-card",
+    "Подарок": "fa fa-gift",
+    "Дивиденты": "fa fa-bar-chart",
+}

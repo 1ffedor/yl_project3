@@ -416,22 +416,30 @@
                 {% for transaction in transactions_dict[date] %}
                 
                     <div class="row d-sm-flex justify-content-between my-3">
-                        <div class="col-1 mx-auto">
-                            <p class="text-center">{{ transaction["date"] }}</p>
+                        <div class="col-sm-3">
+                            <div class="row d-sm-flex justify-content-center mx-auto my-auto">
+                                <i class="mx-auto col-1 fa fa-clock my-auto mr-2" aria-hidden="true"></i>
+                                <p class="col text-start my-auto">{{ transaction["time"] }}</p>
+                            </div>
                         </div>
-                        <div class="col-2 mx-auto">
+                        <div class="col-sm-3 mx-auto">
                             <p class="text-center">{{ transaction["wallet_name"] }}</p>
                         </div>
-                        <div class="col-sm-2 mx-auto d-sm-flex justify-content-between">
-                            <i class="fas fa-bars my-auto"></i>
-                            <p class="text-center my-auto">{{ transaction["category"] }}</p>
+                        
+                        <div class="col-sm-3">
+                            <div class="row">
+                                <i class="mx-auto col-1 {{ transaction['category_i_class'] }} my-auto mr-2" aria-hidden="true"></i>
+                                <p class="col text-start my-auto">{{ transaction["category"] }}</p>
+                            </div>
                         </div>
+                        
+                        
 
-                        <div class="col-sm-2 mx-auto">
+                        <div class="col-sm-3 mx-auto">
                             {% if "+" in transaction["sum"]%}
-                                <p class="text-center text-success">{{ transaction["sum"] }} {{ transaction["currency"] }}</p>
+                                <p class="text-center text-success my-auto">{{ transaction["sum"] }} {{ transaction["currency"] }}</p>
                             {% else %}
-                                <p class="text-center text-danger">{{ transaction["sum"] }} {{ transaction["currency"] }}</p>
+                                <p class="text-center text-danger my-auto">{{ transaction["sum"] }} {{ transaction["currency"] }}</p>
                             {% endif %}
                         </div>
                     </div>

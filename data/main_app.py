@@ -342,6 +342,8 @@ def cabinet_wallets_page():
     input_errors = get_deepcopy_dict(CABINET_WALLETS_PAGE_ADD_WALLET_MODAL_INPUT_ERRORS)
     wallets_list = get_wallets_list(Wallet, current_user)
 
+    all_balance = get_all_balance(current_user, wallets_list)  # получим общий баланс
+
     if add_wallet_form.validate_on_submit():
         #  при нажатии кнопки создать
 
@@ -402,7 +404,7 @@ def cabinet_wallets_page():
 
     return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
                            sidebar_elements=sidebar_elements, form=add_wallet_form, input_errors=input_errors,
-                           wallets=wallets_list)
+                           wallets=wallets_list, all_balance=all_balance)
 
 
 @app.route('/cabinet/transactions', methods=["GET", "POST"])

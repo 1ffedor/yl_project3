@@ -109,6 +109,25 @@
             </div>
         </div>
     </div>
+    {% if all_balance %}
+    <div class="row mx-auto my-2">
+        <div class="card" id="pagenameCard">
+            <!--                заголовок-->
+            <div class="card-header my-auto d-flex justify-content-start">
+                <div class="card-title my-auto d-flex justify-content-start">
+                    <h2 class="my-auto mr-4">
+                        Общий баланс:
+                    </h2> 
+                    {% if "-" in all_balance %}
+                    <h2 class="my-auto text-danger mx-4">{{ all_balance }}</h2>
+                    {% else %}
+                    <h2 class="my-auto text-success mx-4">{{ all_balance }}</h2>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     <!-- Добавить счёт -->
     <div class="modal fade" id="addWalletModal" tabindex="-1" aria-labelledby="addWalletLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
