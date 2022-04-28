@@ -41,8 +41,8 @@
             </button>
 
             <!-- Brand -->
-            <a class="navbar-brand" href="#">
-                <img src="https://mdbootstrap.com/img/logo/mdb-transaprent-noshadows.png" height="25" alt="Mylbudget" loading="lazy"/>
+            <a class="navbar-brand" href="/cabinet">
+                <strong><img src="{{ url_for('static', filename='img/logo.png') }}" height="25" alt="MyLifeBudget" loading="lazy"/></strong>
             </a>
 <!--            &lt;!&ndash; Search form &ndash;&gt;-->
 <!--            <form class="d-none d-md-flex input-group w-auto my-auto">-->
@@ -211,7 +211,7 @@
                         </div>
                         <div class="col-lg-4 col-8 my-auto">
                             <div class="input-group my-auto">
-                                {{ expenses_form.transaction_date(class="form-control rounded", id="selectTransactionDateExpenses", type="datetime-local", max=max_time) }}
+                                {{ expenses_form.transaction_date(class="form-control rounded", id="selectTransactionDateExpenses", type="datetime-local", max=max_time, min="2022-04-01T00:01:00") }}
                             </div>
                         </div>
                     </div>

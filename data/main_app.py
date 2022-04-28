@@ -18,7 +18,7 @@ from func_app import *
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app.config['SECRET_KEY'] = 'MyLifeBudget is very secret'
 # app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(
 #     days=30
 # )
@@ -490,7 +490,7 @@ def cabinet_transactions_page():
     return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
                            sidebar_elements=sidebar_elements, expenses_form=add_transaction_expenses_form,
                            income_form=add_transaction_income_form, input_errors=input_errors,
-                           wallets_names=wallets_names, max_time=get_transaction_max_time(),
+                           wallets_names=wallets_names, max_time=get_transaction_max_time(), min_time="",
                            transactions_dict=transactions_dict, day_transactions_sum_dict=day_transactions_sum_dict)
 
 

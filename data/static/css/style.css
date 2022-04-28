@@ -35,6 +35,7 @@ body {
 
 /*стартовое окно*/
 #start_page_description {
+    margin-top: 20vh !important;
     margin-left: auto !important;
     margin-right: auto !important;
 }
