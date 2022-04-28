@@ -199,9 +199,9 @@ def add_money_to_wallet(Wallet, current_user, wallet_id, expense_sum):
 
 def get_all_balance(current_user, wallets_list):
     balance = 0
+    main_currency = current_user.main_currency
     for wallet in wallets_list:
         balance += int(''.join(wallet["balance_main_currency"].split()))
-        main_currency = current_user.main_currency
     return f"{beautiful_balance(balance)} {main_currency}"
 
 
@@ -378,6 +378,86 @@ def convert_to_main_currency(current_user, current_currency, sum_in_current_curr
         print(e)
         print("some problems with convetr to main curr")
         return sum_in_current_currency
+
+
+def get_budget_chart_data(wallets_list):
+    labels = []
+    data = []
+    background_colors = []
+    for wallet in wallets_list:
+        labels.append(wallet["name"])
+        # data.append(f"""{wallet["balance_main_currency"]} {wallet["main_currency"]}""")
+        data.append(get_normal_int_balance(wallet["balance_main_currency"]))
+        r, g, b = get_random_wallet_color()
+        background_colors.append(rgb_to_hex(r, g, b))
+    budgetChart = {
+        "labels": labels,
+        "datasets": [
+            {
+                "data": data,
+                "backgroundColor": background_colors
+            }
+        ]
+    }
+    return budgetChart
+
+
+def get_normal_int_balance(s, with_minus=False):
+    if not with_minus:
+        if "-" in s:
+            return 0
+        balance = ''.join([s[i] for i in range(len(s)) if s[i].isdigit()])
+        return int(balance)
+    else:
+        balance = ''.join([s[i] for i in range(len(s)) if s[i].isdigit() or s[i] in "+-"])
+        return int(balance)
+
+
+def get_income_expenses_chart(Transaction, current_user):
+    try:
+        expenses_count = 0
+        income_count = 0
+        background_colors = []
+        all_transactions_count = 0
+        db_sess = db_session.create_session()
+        transactions_list = db_sess.query(Transaction).filter(
+            Transaction.user_id == current_user.id).all()
+        if transactions_list:
+            for transaction in transactions_list:
+                current_currency = transaction.currency
+                sum_in_current_currency = transaction.transaction_sum
+                transaction_sum = convert_to_main_currency(current_user, current_currency, sum_in_current_currency)
+                all_transactions_count += transaction_sum
+                if transaction.transaction_type == "expenses":
+                    expenses_count += transaction_sum
+                else:
+                    income_count += transaction_sum
+            label = "Расходы / Доходы"
+            labels = ["Расходы", "Доходы"]
+            data = [(expenses_count / all_transactions_count) * 100,
+                    (income_count / all_transactions_count) * 100]
+            for i in range(2):
+                r, g, b = get_random_wallet_color()
+                background_colors.append(rgb_to_hex(r, g, b))
+            incomeexpensesChart = {
+                "labels": labels,
+                "datasets": [
+                    {
+                        "label": '%',
+                        "data": data,
+                        "backgroundColor": background_colors
+                    }
+                ]
+            }
+            return incomeexpensesChart
+    except Exception as e:
+        print(e)
+        print("some problems with get_income_expenses_chart")
+
+
+
+
+
 
 
 

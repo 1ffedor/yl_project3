@@ -77,17 +77,7 @@ CABINET_PAGE_SIDEBAR_ELEMENTS = {
         "a_class": "list-group-item list-group-item-action py-2 ripple",
         "i_class": "fas fa-tachometer-alt fa-fw me-3",
         "text": "Операции"
-    },
-    "Доходы": {
-        "href": "/cabinet/income",
-        "a_class": "list-group-item list-group-item-action py-2 ripple",
-        "i_class": "fas fa-tachometer-alt fa-fw me-3",
-        "text": "Доходы"},
-    "Расходы": {
-        "href": "/cabinet/expenses",
-        "a_class": "list-group-item list-group-item-action py-2 ripple",
-        "i_class": "fas fa-tachometer-alt fa-fw me-3",
-        "text": "Расходы"}
+    }
 }
 
 # CABINET_WALLETS_PAGE

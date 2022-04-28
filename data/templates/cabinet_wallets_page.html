@@ -114,14 +114,14 @@
         <div class="card" id="pagenameCard">
             <!--                заголовок-->
             <div class="card-header my-auto d-flex justify-content-start">
-                <div class="card-title my-auto d-flex justify-content-start">
-                    <h2 class="my-auto mr-4">
+                <div class="card-title my-auto d-sm-flex justify-content-start">
+                    <h3 class="my-auto mr-4">
                         Общий баланс:
-                    </h2> 
+                    </h3> 
                     {% if "-" in all_balance %}
-                    <h2 class="my-auto text-danger mx-4">{{ all_balance }}</h2>
+                    <h3 class="my-auto text-danger mx-4">{{ all_balance }}</h3>
                     {% else %}
-                    <h2 class="my-auto text-success mx-4">{{ all_balance }}</h2>
+                    <h3 class="my-auto text-success mx-4">{{ all_balance }}</h3>
                     {% endif %}
                 </div>
             </div>
@@ -215,7 +215,7 @@
     <div class="row mx-auto d-sm-flex justify-content-evenly">
         {% if wallets %}
             {% for wallet in wallets %}
-                <div class="card col-lg-3 col-md-5 my-2 mx-2">
+                <div class="card col-lg-4 col-md-5 my-2 mx-2">
                 <!--                заголовок-->
                     <div class="card-header my-auto text-center ">
                         <h3 class="my-auto">
@@ -223,16 +223,18 @@
                         </h3>
                     </div>
                     <!--                тело-->
-                    <div class="card-body d-flex justify-content-start">
-                        <div class="ml-0 col-md-5">
-                            <img class="wallet_img" src="{{ url_for('static', filename='img/card.png') }}" height="57" width="85" alt="" loading="lazy" style="background: {{ wallet['wallet_color'] }}"/>
-                        </div>
-                        <div class="col-md-5 col-12">
-                            <div class="row">
-                                <h5><strong>{{ wallet["balance"] }} {{ wallet["currency"]}}</strong></h5>
+                    <div class="card-body">
+                        <div class="row d-sm-flex justify-content-evenly my-3">
+                            <div class="col-xl-6 col-lg-12 col-6 mb-3">
+                                <img class="wallet_img" src="{{ url_for('static', filename='img/card.png') }}" height="57" width="85" alt="" loading="lazy" style="background: {{ wallet['wallet_color'] }}"/>
                             </div>
-                             <div class="row">
-                                <h6>( {{ wallet["balance_main_currency"] }} {{ wallet["main_currency"]}} )</h6>
+                            <div class="col-xl-6 col-lg-12 col-6">
+                                <div class="row">
+                                    <h5><strong>{{ wallet["balance"] }} {{ wallet["currency"]}}</strong></h5>
+                                </div>
+                                 <div class="row">
+                                    <h6>( {{ wallet["balance_main_currency"] }} {{ wallet["main_currency"]}} )</h6>
+                                </div>
                             </div>
                         </div>
                     </div>

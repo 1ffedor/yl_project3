@@ -312,8 +312,18 @@ def cabinet_menu_page():
 
     set_sidebar_a_active_class(sidebar_elements, page_title)  # устновить синим
 
+    wallets_list = get_wallets_list(Wallet, current_user)
+    budgetChart = get_budget_chart_data(wallets_list)
+    all_balance = get_all_balance(current_user, wallets_list)
+
+    incomeexpensesChart = get_income_expenses_chart(Transaction, current_user)
+
+    transactions_dict = get_transactions_dict(Transaction, Wallet, current_user)  # список транзакций для истории
+    day_transactions_sum_dict = get_day_transactions_sum(current_user, transactions_dict)  # сумма за день
+
     return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
-                           sidebar_elements=sidebar_elements)
+                           sidebar_elements=sidebar_elements, budgetChart=budgetChart, all_balance=all_balance,
+                           incomeexpensesChart=incomeexpensesChart)
     # return redirect('/login')
 
 
@@ -351,41 +361,12 @@ def cabinet_wallets_page():
         balance = add_wallet_form.balance.data
         main_currency = add_wallet_form.main_currency.data[0]
         wallet_color = request.form.get('walletcolor')
-        # print(wallet_name, balance, main_currency)
 
-        # if not str(balance).isdigit():
-        #     have_errors = True
-        #     input_form = "balance"
-        #
-        #     message = "Могут быть использованы только цифры!"
-        #
-        #     # красная рамка
-        #     input_errors[input_form]["errclass"] = is_invalid
-        #     input_errors[input_form]["invalid-feedback"] = message
-        #
         db_sess = db_session.create_session()
         wallet = db_sess.query(Wallet).filter(
             Wallet.wallet_name == wallet_name, Wallet.user_id == current_user.id).first()
         if wallet:
             wallet_name = new_wallet_name(Wallet, current_user, wallet_name)
-        #
-        # if wallet:
-        #     print(1)
-        #     have_errors = True
-        #     input_form = "name"
-        #
-        #     message = "Кошелёк с таким именем уже есть!"
-        #
-        #     # красная рамка
-        #     input_errors[input_form]["errclass"] = is_invalid
-        #     input_errors[input_form]["invalid-feedback"] = message
-        #
-        # if have_errors:
-        #     return render_template(html, page_title=page_title, user=current_user.username,
-        #                            avatar_path=avatar_path,
-        #                            sidebar_elements=sidebar_elements,
-        #                            form=add_wallet_form, input_errors=input_errors,
-        #                            wallets=wallets_list)
 
         try:
             db_sess = db_session.create_session()
@@ -511,46 +492,6 @@ def cabinet_transactions_page():
                            income_form=add_transaction_income_form, input_errors=input_errors,
                            wallets_names=wallets_names, max_time=get_transaction_max_time(),
                            transactions_dict=transactions_dict, day_transactions_sum_dict=day_transactions_sum_dict)
-
-
-@app.route('/cabinet/income')
-@login_required
-def cabinet_income_page():
-    current_user = flask_login.current_user
-    if not current_user.is_authenticated:
-        return redirect('/login')
-
-    page_title = "Доходы"
-    message = ""
-    html = "cabinet_income_page.html"
-    have_errors = False
-    avatar_path = get_avatar_from_db(current_user)
-    sidebar_elements = get_deepcopy_dict(CABINET_PAGE_SIDEBAR_ELEMENTS)  # полная копия
-
-    set_sidebar_a_active_class(sidebar_elements, page_title)  # устновить синим
-
-    return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
-                           sidebar_elements=sidebar_elements)
-
-
-@app.route('/cabinet/expenses')
-@login_required
-def cabinet_expenses_page():
-    current_user = flask_login.current_user
-    if not current_user.is_authenticated:
-        return redirect('/login')
-
-    page_title = "Расходы"
-    message = ""
-    html = "cabinet_expenses_page.html"
-    have_errors = False
-    avatar_path = get_avatar_from_db(current_user)
-    sidebar_elements = get_deepcopy_dict(CABINET_PAGE_SIDEBAR_ELEMENTS)  # полная копия
-
-    set_sidebar_a_active_class(sidebar_elements, page_title)  # устновить синим
-
-    return render_template(html, page_title=page_title, user=current_user.username, avatar_path=avatar_path,
-                           sidebar_elements=sidebar_elements)
 
 
 if __name__ == '__main__':
